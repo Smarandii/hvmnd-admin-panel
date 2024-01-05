@@ -140,6 +140,7 @@
             <div class="table-responsive">
                 <table>
                     <tr class="header">
+                        <th>Row number</th>
                         <th>Telegram ID</th>
                         <th>Telegram Nickname</th>
                         <th>Balance</th>
@@ -153,6 +154,7 @@
                     <tbody id="userTable">
                         {% for user in users %}
                         <tr>
+                            <td>{{ loop.index }}</td>
                             <td>{{ user.user_telegram_id }}</td>
                             <td>{{ user.user_telegram_nickname }}</td>
                             <td>
