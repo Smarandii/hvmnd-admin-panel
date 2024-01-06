@@ -137,6 +137,14 @@
             <div class="search-container">
                 <input type="text" id="searchInput" class="search-input" placeholder="Search users...">
             </div>
+            <div class="totals-display">
+                <p><strong>Total Balance:</strong> {{ "{:,.2f}".format(totals['total_balance']).replace(',', ' ') }}</p>
+                <p><strong>Total Bonus:</strong> {{ "{:,.2f}".format(totals['total_bonus']).replace(',', ' ') }}</p>
+                <p><strong>Total Spent:</strong> {{ "{:,.2f}".format(totals['total_spent']).replace(',', ' ') }}</p>
+            </div>
+
+
+
             <div class="table-responsive">
                 <table>
                     <tr class="header">

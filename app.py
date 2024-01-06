@@ -1,22 +1,45 @@
+import os
+from dotenv import \
+    load_dotenv
 from flask import Flask, render_template, request, redirect, url_for
 from flask_pymongo import PyMongo
+load_dotenv()
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb://admin:WIyniFnVBpcbG1pJ@ac-czkatd4-shard-00-01.aaaafpm.mongodb.net:27017,ac-czkatd4-shard-00-00.aaaafpm.mongodb.net:27017,ac-czkatd4-shard-00-02.aaaafpm.mongodb.net:27017/hvmnd_db?ssl=true&retryWrites=true&replicaSet=atlas-zqt5j0-shard-0&readPreference=primary&connectTimeoutMS=10000&authSource=admin&authMechanism=SCRAM-SHA-1"
+app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 mongo = PyMongo(app)
 
 
 @app.route('/')
 def index():
-    data = mongo.db.user_sessions.find()
-    data = [doc for doc in data]
-    return render_template('users.html', users=data)
+    try:
+        pipeline = [
+            {"$group": {
+                "_id": None,
+                "total_balance": {"$sum": "$balance"},
+                "total_bonus": {"$sum": "$bonus"},
+                "total_spent": {"$sum": "$total_spent"}
+            }}
+        ]
+        totals = list(mongo.db.user_sessions.aggregate(pipeline))[0]
+
+        for key in totals.keys():
+            if key != "_id":
+                totals[key] = round(totals[key], 2)
+
+        users = list(mongo.db.user_sessions.find())
+    except Exception as e:
+
+        print(f"An error occurred: {e}")
+        users = []
+        totals = {"total_balance": 0.0, "total_bonus": 0.0, "total_spent": 0.0}
+
+    return render_template('users.html', users=users, totals=totals)
 
 
 @app.route('/update_balance/<user_telegram_id>', methods=['POST'])
 def update_balance(user_telegram_id):
     new_balance = request.form['balance']
-    # Update user balance
     mongo.db.user_sessions.update_one({"user_telegram_id": int(user_telegram_id)},
                                       {"$set": {"balance": float(new_balance)}})
 
