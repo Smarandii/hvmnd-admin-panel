@@ -104,6 +104,43 @@
         .content-wrap {
             padding-bottom: 60px; /* Footer height */
         }
+        .sorted-asc::after {
+            content: '▲';
+            font-size: 0.8em;
+        }
+
+        .sorted-desc::after {
+            content: '▼';
+            font-size: 0.8em;
+        }
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 10px; /* Spacing between the header and the table */
+        }
+
+        .clear-sorting-button {
+            margin-right: 10px; /* Spacing between the button and the title */
+            padding: 5px 10px; /* Padding inside the button */
+            cursor: pointer; /* Changes cursor to indicate the button is clickable */
+        }
+
+        .table-title {
+            margin: 0; /* Remove default margin of heading */
+        }
+
+        th {
+            background-color: #f2f2f2;
+            text-transform: uppercase;
+            cursor: pointer; /* Indicates clickable items */
+            transition: background-color 0.3s ease; /* Smooth transition for background color */
+        }
+
+        th:hover {
+            background-color: #e0e0e0; /* Slightly darker shade on hover */
+        }
+
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
@@ -116,6 +153,48 @@
             });
         });
     </script>
+
+    <script>
+        $(document).ready(function(){
+            var originalRows = $('#userTable tr').toArray(); // Store the original row order
+
+            $('th').click(function(){
+                var table = $(this).parents('table').eq(0);
+                var index = $(this).index();
+                var rows = table.find('tr:gt(0)').toArray().sort(comparer(index));
+                this.asc = !this.asc;
+                if (!this.asc) { rows = rows.reverse(); }
+                for (var i = 0; i < rows.length; i++) { table.append(rows[i]); }
+
+                $('th').removeClass('sorted-asc sorted-desc');
+                $(this).addClass(this.asc ? 'sorted-asc' : 'sorted-desc');
+            });
+
+            function comparer(index) {
+                return function(a, b) {
+                    var valA = getCellValue(a, index), valB = getCellValue(b, index);
+                    return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB);
+                }
+            }
+
+            function getCellValue(row, index) {
+                var cell = $(row).children('td').eq(index);
+                var input = cell.find('input[type=number]');
+                return input.length ? parseFloat(input.val()) : cell.text();
+            }
+
+            $('#clearSorting').click(function() {
+                $('th').removeClass('sorted-asc sorted-desc');
+                var table = $('#userTable');
+                $.each(originalRows, function(index, row) {
+                    table.append(row);
+                });
+            });
+        });
+    </script>
+
+
+
 </head>
 <body>
     <header>
@@ -144,6 +223,10 @@
             </div>
 
 
+            <div class="table-header">
+                <button id="clearSorting" class="clear-sorting-button">Clear Sorting</button>
+                <h2 class="table-title">User Management Table</h2>
+            </div>
 
             <div class="table-responsive">
                 <table>
