@@ -1,32 +1,18 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>User Data</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/users-style.css') }}">
-        <script src="{{ url_for('static', filename='js/search.js') }}"></script>
+{% extends "base.html" %}
 
-    </head>
-    <body>
-        <header>
-            <div class="container">
-                <div id="branding">
-                    <a href="/"><h1><span class="highlight">User</span> Management System</h1></a>
-                </div>
-                <nav>
-                    <ul>
-                        {% if session.get('logged_in') %}
-                            <li class="current">
-                                <a href="{{ url_for('logout') }}">
-                                    Logout
-                                </a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-            </div>
-        </header>
+{% block title %}User Data{% endblock %}
 
-        <div class="container">
+{% block links %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/users-style.css') }}">
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/search.js') }}"></script>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
             <div class="content-wrap">
                 <div class="search-container">
                     <form id="searchForm" method="GET" action="{{ url_for('index') }}">
@@ -150,13 +136,13 @@
                                 <td>
                                     <form action="/update_balance/{{ user.user_telegram_id }}" method="post">
                                         <input type="number" name="balance" value="{{ user.balance }}" min="0" step="any">
-                                        <button type="submit">Update</button>
+                                        <button type="submit" class="update-button">Update</button>
                                     </form>
                                 </td>
                                 <td>
                                     <form action="/update_bonus/{{ user.user_telegram_id }}" method="post">
                                         <input type="number" name="bonus" value="{{ user.bonus }}" min="0" step="any">
-                                        <button type="submit">Update</button>
+                                        <button type="submit" class="update-button">Update</button>
                                     </form>
                                 </td>
                                 <td>{{ user.total_spent }}</td>
@@ -171,5 +157,4 @@
                 </div>
             </div>
         </div>
-    </body>
-</html>
+{% endblock %}

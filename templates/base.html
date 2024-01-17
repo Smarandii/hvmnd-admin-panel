@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block page_title %}{% endblock %}</title>
+        {% block links %}
+        {% endblock %}
+        {% block scripts %}
+        {% endblock %}
+    </head>
+<body>
+
+    <header>
+        <div class="container">
+            <div id="branding">
+                <a href="/"><h1><span class="highlight">User</span> Management System</h1></a>
+            </div>
+            <nav>
+                <ul>
+                    {% if session.get('logged_in') %}
+                        <li class="current">
+                            <a href="{{ url_for('logout') }}">Logout</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

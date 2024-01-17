@@ -98,7 +98,18 @@ footer {
 
 
 .search-button {
+    border-radius: 4px;
     padding: 10px 20px;
+    background-color: #50b3a2;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.update-button {
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin-top: 5px;
     background-color: #50b3a2;
     color: white;
     border: none;
