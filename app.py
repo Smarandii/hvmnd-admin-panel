@@ -1,4 +1,6 @@
 import os
+
+import pymongo
 from dotenv import \
     load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, flash, session
@@ -17,6 +19,11 @@ def index():
         return redirect(url_for('login'))
 
     try:
+        order = request.args.get('order', 'asc')
+        sort_order = pymongo.ASCENDING if order == 'asc' else pymongo.DESCENDING
+        sort_by = request.args.get('sort', '_id')  # Default sort by ID
+        users = list(mongo.db.user_sessions.find().sort(sort_by, sort_order))
+
         pipeline = [
             {"$group": {
                 "_id": None,
@@ -31,7 +38,6 @@ def index():
             if key != "_id":
                 totals[key] = round(totals[key], 2)
 
-        users = list(mongo.db.user_sessions.find())
     except Exception as e:
 
         print(f"An error occurred: {e}")

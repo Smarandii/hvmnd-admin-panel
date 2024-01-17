@@ -183,3 +183,26 @@ th:hover {
     color: red;
     margin-bottom: 15px;
 }
+
+
+th {
+    cursor: pointer; /* Change cursor to indicate interactivity */
+    background-color: #f2f2f2; /* Background color */
+    text-transform: uppercase; /* Uppercase text */
+    /* ... other th styles ... */
+}
+
+/* Style for the sorting links to not look like traditional hyperlinks */
+th a {
+    color: inherit; /* Inherit the color from the th element */
+    text-decoration: none; /* Remove underline */
+    display: flex; /* Use flexbox for layout */
+    align-items: center; /* Align items vertically */
+    justify-content: space-between; /* Space between text and arrow */
+}
+
+/* Sorting Arrows */
+.sort-arrow {
+    font-size: 0.8em; /* Smaller font size for arrows */
+    margin-left: 5px; /* Space between text and arrow */
+}
