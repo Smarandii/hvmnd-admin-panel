@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment History</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/payment-history.css') }}">
+</head>
+<body>
+    <header>
+            <div class="container">
+                <div id="branding">
+                    <h1><span class="highlight">User</span> Management System</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li class="current">
+                            <a href="/">
+                                Home
+                            </a>
+                        </li>
+                        {% if session.get('logged_in') %}
+                            <li class="current">
+                                <a href="{{ url_for('logout') }}">
+                                    Logout
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </header>
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{{ url_for('index') }}">
+                        Home
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    <a href="{{ url_for('payment_history', telegram_id=user.user_telegram_id, sort='datetime', order='desc') }}">
+                        {{ user.user_telegram_nickname }}
+                    </a>
+                </li>
+            </ol>
+        </nav>
+        <h2>Payment History for <a href="https://t.me/{{ user.user_telegram_nickname }}" target="_blank">@{{ user.user_telegram_nickname }}</a></h2>
+        <div class="history-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="{{ url_for('payment_history', telegram_id=user.user_telegram_id, sort='operation_id', order='asc' if request.args.get('sort') == 'operation_id' and request.args.get('order') != 'asc' else 'desc') }}">
+                                Operation ID
+                                {% if request.args.get('sort') == 'operation_id' %}
+                                    <span class="sort-arrow">{{ '▲' if request.args.get('order') == 'asc' else '▼' }}</span>
+                                {% endif %}
+                            </a>
+                        </th>
+                        <th>
+                            <a href="{{ url_for('payment_history', telegram_id=user.user_telegram_id, sort='datetime', order='asc' if request.args.get('sort') == 'datetime' and request.args.get('order') != 'asc' else 'desc') }}">
+                                Date/Time
+                                {% if request.args.get('sort') == 'datetime' %}
+                                    <span class="sort-arrow">{{ '▲' if request.args.get('order') == 'asc' else '▼' }}</span>
+                                {% endif %}
+                            </a>
+                        </th>
+                        <th>
+                            <a href="{{ url_for('payment_history', telegram_id=user.user_telegram_id, sort='amount', order='asc' if request.args.get('sort') == 'amount' and request.args.get('order') != 'asc' else 'desc') }}">
+                                Amount
+                                {% if request.args.get('sort') == 'amount' %}
+                                    <span class="sort-arrow">{{ '▲' if request.args.get('order') == 'asc' else '▼' }}</span>
+                                {% endif %}
+                            </a>
+                        </th>
+                        <th>
+                            <a href="{{ url_for('payment_history', telegram_id=user.user_telegram_id, sort='status', order='asc' if request.args.get('sort') == 'status' and request.args.get('order') != 'asc' else 'desc') }}">
+                                Status
+                                {% if request.args.get('sort') == 'status' %}
+                                    <span class="sort-arrow">{{ '▲' if request.args.get('order') == 'asc' else '▼' }}</span>
+                                {% endif %}
+                            </a>
+                        </th>
+                        <th>
+                            <a href="{{ url_for('payment_history', telegram_id=user.user_telegram_id, sort='title', order='asc' if request.args.get('sort') == 'title' and request.args.get('order') != 'asc' else 'desc') }}">
+                                Title
+                                {% if request.args.get('sort') == 'title' %}
+                                    <span class="sort-arrow">{{ '▲' if request.args.get('order') == 'asc' else '▼' }}</span>
+                                {% endif %}
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td>{{ payment.operation_id }}</td>
+                        <td>{{ payment.datetime.strftime('%m/%d/%Y %H:%M') }}</td>
+                        <td>{{ "%.2f"|format(payment.amount) }} ₽</td>
+                        <td><span class="status {{ 'paid' if payment.status.lower() == 'success' else 'unpaid' }}">{{ payment.status }}</span></td>
+                        <td>{{ payment.title }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6">No payment history found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

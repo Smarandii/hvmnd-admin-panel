@@ -18,11 +18,34 @@ def index():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
 
+    search_query = request.args.get('search', '')
+    sort_by = request.args.get('sort', 'user_telegram_id')
+    order = request.args.get('order', 'asc')
+    sort_order = pymongo.ASCENDING if order == 'asc' else pymongo.DESCENDING
+
     try:
-        order = request.args.get('order', 'asc')
-        sort_order = pymongo.ASCENDING if order == 'asc' else pymongo.DESCENDING
-        sort_by = request.args.get('sort', '_id')  # Default sort by ID
-        users = list(mongo.db.user_sessions.find().sort(sort_by, sort_order))
+        query = {}
+        if search_query:
+            search_regex = {'$regex': search_query, '$options': 'i'}
+            query['$or'] = [
+                {'user_telegram_nickname': search_regex},
+            ]
+
+            try:
+                numeric_search = float(search_query)
+                numeric_conditions = [
+                    {'user_telegram_id': numeric_search},
+                    {'balance': numeric_search},
+                    {'bonus': numeric_search},
+                    {'total_spent': numeric_search},
+                    {'price_multiplier': numeric_search},
+                ]
+                query['$or'].extend(numeric_conditions)
+            except ValueError:
+                # If conversion fails, skip adding numeric fields to the query
+                pass
+
+        users = list(mongo.db.user_sessions.find(query).sort(sort_by, sort_order))
 
         pipeline = [
             {"$group": {
@@ -44,7 +67,7 @@ def index():
         users = []
         totals = {"total_balance": 0.0, "total_bonus": 0.0, "total_spent": 0.0}
 
-    return render_template('users.html', users=users, totals=totals)
+    return render_template('users.html', users=users, totals=totals, search=search_query)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -88,6 +111,24 @@ def update_bonus(user_telegram_id):
                                       {"$set": {"bonus": float(new_bonus)}})
 
     return redirect(url_for('index'))
+
+
+@app.route('/payment_history/<int:telegram_id>')
+def payment_history(telegram_id):
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+
+    sort_by = request.args.get('sort', 'datetime')
+    order = request.args.get('order', 'desc')
+    sort_order = pymongo.ASCENDING if order == 'asc' else pymongo.DESCENDING
+
+    try:
+        payments = mongo.db.payments.find({"label": str(telegram_id)}).sort(sort_by, sort_order)
+        user = mongo.db.user_sessions.find_one({"user_telegram_id": telegram_id})
+        return render_template('payment_history.html', payments=payments, user=user)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return "Error fetching payment history"
 
 
 if __name__ == '__main__':
