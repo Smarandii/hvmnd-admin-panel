@@ -132,4 +132,4 @@ def payment_history(telegram_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=bool(os.getenv("IS_DEBUG", False)))

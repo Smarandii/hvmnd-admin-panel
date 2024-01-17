@@ -15,7 +15,7 @@ header {
     color: white;
     padding-top: 30px;
     min-height: 70px;
-    border-bottom: #cd7259 3px solid;
+    border-bottom: #2E0F15 3px solid;
 }
 header a {
     color: #ffffff;
@@ -45,7 +45,7 @@ header nav {
     margin-top: 10px;
 }
 header .highlight, header .current a {
-    color: #cd7259;
+    color: #2E0F15;
     font-weight: bold;
 }
 header a:hover {
@@ -76,22 +76,40 @@ footer {
     padding: 20px;
     margin-top: 20px;
     color: #ffffff;
-    background-color: #cd7259;
+    background-color: #2E0F15;
     text-align: center;
 }
 
 .search-container {
-    margin-bottom: 20px;
-    margin-top: 20px;
+    margin: 20px auto;
+    width: 90%; /* Adjust width to match the table's width */
+    max-width: 1200px; /* You can adjust this to match the table's max width */
+    display: flex;
+    justify-content: center; /* Center the search bar if it's smaller than the container */
 }
 
 .search-input {
-    width: 100%;
+    flex-grow: 1; /* Allow input to take available space */
     padding: 10px;
     font-size: 17px;
     border: 1px solid #ddd;
-    margin-bottom: 10px;
+    /* Remove margin-right if no button next to the search bar */
 }
+
+
+.search-button {
+    padding: 10px 20px;
+    background-color: #50b3a2;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background-color: #429186;
+}
+
+
 html, body {
     height: 100%;
     margin: 0;
