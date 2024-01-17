@@ -1,276 +1,100 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>User Data</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-        .container {
-            width: 90%;
-            margin: auto;
-            overflow: hidden;
-        }
-        header {
-            background: #50b3a2;
-            color: white;
-            padding-top: 30px;
-            min-height: 70px;
-            border-bottom: #cd7259 3px solid;
-        }
-        header a {
-            color: #ffffff;
-            text-decoration: none;
-            text-transform: uppercase;
-            font-size: 16px;
-        }
-        header ul {
-            padding: 0;
-            margin: 0;
-            list-style: none;
-            overflow: hidden;
-        }
-        header li {
-            float: left;
-            display: inline;
-            padding: 0 20px 0 20px;
-        }
-        header #branding {
-            float: left;
-        }
-        header #branding h1 {
-            margin: 0;
-        }
-        header nav {
-            float: right;
-            margin-top: 10px;
-        }
-        header .highlight, header .current a {
-            color: #cd7259;
-            font-weight: bold;
-        }
-        header a:hover {
-            color: #ffffff;
-            font-weight: bold;
-        }
-        .table-responsive {
-            margin-top: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-            text-transform: uppercase;
-        }
-        tr:hover {
-            background-color: #e9e9e9;
-        }
-        footer {
-            padding: 20px;
-            margin-top: 20px;
-            color: #ffffff;
-            background-color: #cd7259;
-            text-align: center;
-        }
+    <head>
+        <title>User Data</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/users-style.css') }}">
+        <script src="{{ url_for('static', filename='js/users-script.js') }}"></script>
 
-        .search-container {
-            margin-bottom: 20px;
-            margin-top: 20px;
-        }
+        <link rel="stylesheet" type="text/css" href="/static/css/users-style.css">
+        <script src="/js/users-script.js"></script>
 
-        .search-input {
-            width: 100%;
-            padding: 10px;
-            font-size: 17px;
-            border: 1px solid #ddd;
-            margin-bottom: 10px;
-        }
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
-        .content-wrap {
-            padding-bottom: 60px; /* Footer height */
-        }
-        .sorted-asc::after {
-            content: '▲';
-            font-size: 0.8em;
-        }
+    </head>
+    <body>
+        <header>
+            <div class="container">
+                <div id="branding">
+                    <h1><span class="highlight">User</span> Management System</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li class="current">
+                            <a href="/">
+                                Home
+                            </a>
+                        </li>
+                        {% if session.get('logged_in') %}
+                            <li class="current">
+                                <a href="{{ url_for('logout') }}">
+                                    Logout
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </header>
 
-        .sorted-desc::after {
-            content: '▼';
-            font-size: 0.8em;
-        }
-        .table-header {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            margin-bottom: 10px; /* Spacing between the header and the table */
-        }
-
-        .clear-sorting-button {
-            margin-right: 10px; /* Spacing between the button and the title */
-            padding: 5px 10px; /* Padding inside the button */
-            cursor: pointer; /* Changes cursor to indicate the button is clickable */
-        }
-
-        .table-title {
-            margin: 0; /* Remove default margin of heading */
-        }
-
-        th {
-            background-color: #f2f2f2;
-            text-transform: uppercase;
-            cursor: pointer; /* Indicates clickable items */
-            transition: background-color 0.3s ease; /* Smooth transition for background color */
-        }
-
-        th:hover {
-            background-color: #e0e0e0; /* Slightly darker shade on hover */
-        }
-
-    </style>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        $(document).ready(function(){
-            $("#searchInput").on("keyup", function() {
-                var value = $(this).val().toLowerCase();
-                $("#userTable tr:not(.header)").filter(function() {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-                });
-            });
-        });
-    </script>
-
-    <script>
-        $(document).ready(function(){
-            var originalRows = $('#userTable tr').toArray(); // Store the original row order
-
-            $('th').click(function(){
-                var table = $(this).parents('table').eq(0);
-                var index = $(this).index();
-                var rows = table.find('tr:gt(0)').toArray().sort(comparer(index));
-                this.asc = !this.asc;
-                if (!this.asc) { rows = rows.reverse(); }
-                for (var i = 0; i < rows.length; i++) { table.append(rows[i]); }
-
-                $('th').removeClass('sorted-asc sorted-desc');
-                $(this).addClass(this.asc ? 'sorted-asc' : 'sorted-desc');
-            });
-
-            function comparer(index) {
-                return function(a, b) {
-                    var valA = getCellValue(a, index), valB = getCellValue(b, index);
-                    return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB);
-                }
-            }
-
-            function getCellValue(row, index) {
-                var cell = $(row).children('td').eq(index);
-                var input = cell.find('input[type=number]');
-                return input.length ? parseFloat(input.val()) : cell.text();
-            }
-
-            $('#clearSorting').click(function() {
-                $('th').removeClass('sorted-asc sorted-desc');
-                var table = $('#userTable');
-                $.each(originalRows, function(index, row) {
-                    table.append(row);
-                });
-            });
-        });
-    </script>
-
-
-
-</head>
-<body>
-    <header>
         <div class="container">
-            <div id="branding">
-                <h1><span class="highlight">User</span> Management System</h1>
-            </div>
-            <nav>
-                <ul>
-                    <li class="current"><a href="/">Home</a></li>
-                    <!-- Add more navigation items if needed -->
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <div class="container">
-        <div class="content-wrap">
-            <div class="search-container">
-                <input type="text" id="searchInput" class="search-input" placeholder="Search users...">
-            </div>
-            <div class="totals-display">
-                <p><strong>Total Balance:</strong> {{ "{:,.2f}".format(totals['total_balance']).replace(',', ' ') }}</p>
-                <p><strong>Total Bonus:</strong> {{ "{:,.2f}".format(totals['total_bonus']).replace(',', ' ') }}</p>
-                <p><strong>Total Spent:</strong> {{ "{:,.2f}".format(totals['total_spent']).replace(',', ' ') }}</p>
-            </div>
+            <div class="content-wrap">
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search users...">
+                </div>
+                <div class="totals-display">
+                    <p><strong>Total Balance:</strong> {{ "{:,.2f}".format(totals['total_balance']).replace(',', ' ') }}</p>
+                    <p><strong>Total Bonus:</strong> {{ "{:,.2f}".format(totals['total_bonus']).replace(',', ' ') }}</p>
+                    <p><strong>Total Spent:</strong> {{ "{:,.2f}".format(totals['total_spent']).replace(',', ' ') }}</p>
+                </div>
 
 
-            <div class="table-header">
-                <button id="clearSorting" class="clear-sorting-button">Clear Sorting</button>
-                <h2 class="table-title">User Management Table</h2>
-            </div>
+                <div class="table-header">
+                    <button id="clearSorting" class="clear-sorting-button">Clear Sorting</button>
+                    <h2 class="table-title">User Management Table</h2>
+                </div>
 
-            <div class="table-responsive">
-                <table>
-                    <tr class="header">
-                        <th>Row number</th>
-                        <th>Telegram ID</th>
-                        <th>Telegram Nickname</th>
-                        <th>Balance</th>
-                        <th>Bonus</th>
-                        <th>Total Spent</th>
-                        <th>Is Active</th>
-                        <th>Top Up Active</th>
-                        <th>Price Multiplier</th>
-                        <th>Bot Blocked</th>
-                    </tr>
-                    <tbody id="userTable">
-                        {% for user in users %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td>{{ user.user_telegram_id }}</td>
-                            <td>{{ user.user_telegram_nickname }}</td>
-                            <td>
-                                <form action="/update_balance/{{ user.user_telegram_id }}" method="post">
-                                    <input type="number" name="balance" value="{{ user.balance }}" min="0" step="any">
-                                    <button type="submit">Update</button>
-                                </form>
-                            </td>
-                            <td>
-                                <form action="/update_bonus/{{ user.user_telegram_id }}" method="post">
-                                    <input type="number" name="bonus" value="{{ user.bonus }}" min="0" step="any">
-                                    <button type="submit">Update</button>
-                                </form>
-                            </td>
-                            <td>{{ user.total_spent }}</td>
-                            <td>{{ user.is_active }}</td>
-                            <td>{{ user.top_up_is_active }}</td>
-                            <td>{{ user.price_multiplier }}</td>
-                            <td>{{ user.bot_blocked }}</td>
+                <div class="table-responsive">
+                    <table>
+                        <tr class="header">
+                            <th>Row number</th>
+                            <th>Telegram ID</th>
+                            <th>Telegram Nickname</th>
+                            <th>Balance</th>
+                            <th>Bonus</th>
+                            <th>Total Spent</th>
+                            <th>Is Active</th>
+                            <th>Top Up Active</th>
+                            <th>Price Multiplier</th>
+                            <th>Bot Blocked</th>
                         </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        <tbody id="userTable">
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ user.user_telegram_id }}</td>
+                                <td>{{ user.user_telegram_nickname }}</td>
+                                <td>
+                                    <form action="/update_balance/{{ user.user_telegram_id }}" method="post">
+                                        <input type="number" name="balance" value="{{ user.balance }}" min="0" step="any">
+                                        <button type="submit">Update</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form action="/update_bonus/{{ user.user_telegram_id }}" method="post">
+                                        <input type="number" name="bonus" value="{{ user.bonus }}" min="0" step="any">
+                                        <button type="submit">Update</button>
+                                    </form>
+                                </td>
+                                <td>{{ user.total_spent }}</td>
+                                <td>{{ user.is_active }}</td>
+                                <td>{{ user.top_up_is_active }}</td>
+                                <td>{{ user.price_multiplier }}</td>
+                                <td>{{ user.bot_blocked }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
-</body>
+    </body>
 </html>
