@@ -9,7 +9,7 @@ from flask_pymongo import PyMongo
 load_dotenv()
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb+srv://admin:WIyniFnVBpcbG1pJ@cluster0.aaaafpm.mongodb.net/new_database?retryWrites=true&w=majority"
+app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 mongo = PyMongo(app)
 
