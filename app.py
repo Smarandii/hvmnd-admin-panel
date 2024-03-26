@@ -5,10 +5,11 @@ from dotenv import \
     load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_pymongo import PyMongo
+
 load_dotenv()
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = os.getenv("MONGO_URI")
+app.config["MONGO_URI"] = "mongodb+srv://admin:WIyniFnVBpcbG1pJ@cluster0.aaaafpm.mongodb.net/new_database?retryWrites=true&w=majority"
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 mongo = PyMongo(app)
 
@@ -19,7 +20,7 @@ def index():
         return redirect(url_for('login'))
 
     search_query = request.args.get('search', '')
-    sort_by = request.args.get('sort', 'user_telegram_id')
+    sort_by = request.args.get('sort', "id")
     order = request.args.get('order', 'asc')
     sort_order = pymongo.ASCENDING if order == 'asc' else pymongo.DESCENDING
 
@@ -28,15 +29,17 @@ def index():
         if search_query:
             search_regex = {'$regex': search_query, '$options': 'i'}
             query['$or'] = [
-                {'user_telegram_nickname': search_regex},
+                {'username': search_regex},
+                {'firstname': search_regex},
+                {'lastname': search_regex},
+                {'language_code': search_regex},
             ]
 
             try:
                 numeric_search = float(search_query)
                 numeric_conditions = [
-                    {'user_telegram_id': numeric_search},
+                    {"id": numeric_search},
                     {'balance': numeric_search},
-                    {'bonus': numeric_search},
                     {'total_spent': numeric_search},
                     {'price_multiplier': numeric_search},
                 ]
@@ -45,17 +48,16 @@ def index():
                 # If conversion fails, skip adding numeric fields to the query
                 pass
 
-        users = list(mongo.db.user_sessions.find(query).sort(sort_by, sort_order))
+        users = list(mongo.db.users.find(query).sort(sort_by, sort_order))
 
         pipeline = [
             {"$group": {
                 "_id": None,
                 "total_balance": {"$sum": "$balance"},
-                "total_bonus": {"$sum": "$bonus"},
                 "total_spent": {"$sum": "$total_spent"}
             }}
         ]
-        totals = list(mongo.db.user_sessions.aggregate(pipeline))[0]
+        totals = list(mongo.db.users.aggregate(pipeline))[0]
 
         for key in totals.keys():
             if key != "_id":
@@ -96,24 +98,13 @@ def update_balance(user_telegram_id):
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     new_balance = request.form['balance']
-    mongo.db.user_sessions.update_one({"user_telegram_id": int(user_telegram_id)},
-                                      {"$set": {"balance": float(new_balance)}})
+    mongo.db.users.update_one({"id": int(user_telegram_id)},
+                              {"$set": {"balance": float(new_balance)}})
 
     return redirect(url_for('index'))
 
 
-@app.route('/update_bonus/<user_telegram_id>', methods=['POST'])
-def update_bonus(user_telegram_id):
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    new_bonus = request.form['bonus']
-    mongo.db.user_sessions.update_one({"user_telegram_id": int(user_telegram_id)},
-                                      {"$set": {"bonus": float(new_bonus)}})
-
-    return redirect(url_for('index'))
-
-
-@app.route('/payment_history/<int:telegram_id>')
+@app.route('/payment_history/<int:telegram_id>/')
 def payment_history(telegram_id):
     if not session.get('logged_in'):
         return redirect(url_for('login'))
@@ -123,8 +114,8 @@ def payment_history(telegram_id):
     sort_order = pymongo.ASCENDING if order == 'asc' else pymongo.DESCENDING
 
     try:
-        payments = mongo.db.payments.find({"label": str(telegram_id)}).sort(sort_by, sort_order)
-        user = mongo.db.user_sessions.find_one({"user_telegram_id": telegram_id})
+        payments = mongo.db.payments.find({"user_id": telegram_id}).sort(sort_by, sort_order)
+        user = mongo.db.users.find_one({"id": telegram_id})
         return render_template('payment_history.html', payments=payments, user=user)
     except Exception as e:
         print(f"An error occurred: {e}")

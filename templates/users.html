@@ -24,7 +24,6 @@
 
                 <div class="totals-display">
                     <p><strong>Total Balance:</strong> {{ "{:,.2f}".format(totals['total_balance']).replace(',', ' ') }}</p>
-                    <p><strong>Total Bonus:</strong> {{ "{:,.2f}".format(totals['total_bonus']).replace(',', ' ') }}</p>
                     <p><strong>Total Spent:</strong> {{ "{:,.2f}".format(totals['total_spent']).replace(',', ' ') }}</p>
                 </div>
 
@@ -37,20 +36,20 @@
                                 </a>
                             </th>
                             <th>
-                                <a href="{{ url_for('index', sort='user_telegram_id', order='desc' if request.args.get('sort') == 'user_telegram_id' and request.args.get('order') == 'asc' else 'asc') }}">
+                                <a href="{{ url_for('index', sort='id', order='desc' if request.args.get('sort') == 'id' and request.args.get('order') == 'asc' else 'asc') }}">
                                     Telegram ID
                                     <span class="sort-arrow">
-                                        {% if request.args.get('sort') == 'user_telegram_id' %}
+                                        {% if request.args.get('sort') == 'id' %}
                                             {{ '▲' if request.args.get('order') == 'asc' else '▼' }}
                                         {% endif %}
                                     </span>
                                 </a>
                             </th>
                             <th>
-                                <a href="{{ url_for('index', sort='user_telegram_nickname', order='desc' if request.args.get('sort') == 'user_telegram_nickname' and request.args.get('order') == 'asc' else 'asc') }}">
-                                    Telegram Nickname
+                                <a href="{{ url_for('index', sort='username', order='desc' if request.args.get('sort') == 'username' and request.args.get('order') == 'asc' else 'asc') }}">
+                                    Telegram Username
                                     <span class="sort-arrow">
-                                        {% if request.args.get('sort') == 'user_telegram_nickname' %}
+                                        {% if request.args.get('sort') == 'username' %}
                                             {{ '▲' if request.args.get('order') == 'asc' else '▼' }}
                                         {% endif %}
                                     </span>
@@ -67,16 +66,6 @@
                                 </a>
                             </th>
                             <th>
-                                <a href="{{ url_for('index', sort='bonus', order='desc' if request.args.get('sort') == 'bonus' and request.args.get('order') == 'asc' else 'asc') }}">
-                                    Bonus
-                                    <span class="sort-arrow">
-                                        {% if request.args.get('sort') == 'bonus' %}
-                                            {{ '▲' if request.args.get('order') == 'asc' else '▼' }}
-                                        {% endif %}
-                                    </span>
-                                </a>
-                            </th>
-                            <th>
                                 <a href="{{ url_for('index', sort='total_spent', order='desc' if request.args.get('sort') == 'total_spent' and request.args.get('order') == 'asc' else 'asc') }}">
                                     Total Spent
                                     <span class="sort-arrow">
@@ -86,70 +75,21 @@
                                     </span>
                                 </a>
                             </th>
-                            <th>
-                                <a href="{{ url_for('index', sort='is_active', order='desc' if request.args.get('sort') == 'is_active' and request.args.get('order') == 'asc' else 'asc') }}">
-                                    Is Active
-                                    <span class="sort-arrow">
-                                        {% if request.args.get('sort') == 'is_active' %}
-                                            {{ '▲' if request.args.get('order') == 'asc' else '▼' }}
-                                        {% endif %}
-                                    </span>
-                                </a>
-                            </th>
-                            <th>
-                                <a href="{{ url_for('index', sort='top_up_active', order='desc' if request.args.get('sort') == 'top_up_active' and request.args.get('order') == 'asc' else 'asc') }}">
-                                    Top Up Active
-                                    <span class="sort-arrow">
-                                        {% if request.args.get('sort') == 'top_up_active' %}
-                                            {{ '▲' if request.args.get('order') == 'asc' else '▼' }}
-                                        {% endif %}
-                                    </span>
-                                </a>
-                            </th>
-                            <th>
-                                <a href="{{ url_for('index', sort='price_multiplier', order='desc' if request.args.get('sort') == 'price_multiplier' and request.args.get('order') == 'asc' else 'asc') }}">
-                                    Price Multiplier
-                                    <span class="sort-arrow">
-                                        {% if request.args.get('sort') == 'price_multiplier' %}
-                                            {{ '▲' if request.args.get('order') == 'asc' else '▼' }}
-                                        {% endif %}
-                                    </span>
-                                </a>
-                            </th>
-                            <th>
-                                <a href="{{ url_for('index', sort='bot_blocked', order='desc' if request.args.get('sort') == 'bot_blocked' and request.args.get('order') == 'asc' else 'asc') }}">
-                                    Bot Blocked
-                                    <span class="sort-arrow">
-                                        {% if request.args.get('sort') == 'bot_blocked' %}
-                                            {{ '▲' if request.args.get('order') == 'asc' else '▼' }}
-                                        {% endif %}
-                                    </span>
-                                </a>
-                            </th>
+
                         </tr>
                         <tbody id="userTable">
                             {% for user in users %}
-                            <tr onclick="window.location.href='/payment_history/{{ user.user_telegram_id }}'">
+                            <tr onclick="window.location.href='/payment_history/{{ user.id }}'">
                                 <td>{{ loop.index }}</td>
-                                <td>{{ user.user_telegram_id }}</td>
-                                <td>{{ user.user_telegram_nickname }}</td>
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.username }}</td>
                                 <td>
-                                    <form action="/update_balance/{{ user.user_telegram_id }}" method="post">
+                                    <form action="/update_balance/{{ user.id }}" method="post">
                                         <input type="number" name="balance" value="{{ user.balance }}" min="0" step="any">
                                         <button type="submit" class="update-button">Update</button>
                                     </form>
                                 </td>
-                                <td>
-                                    <form action="/update_bonus/{{ user.user_telegram_id }}" method="post">
-                                        <input type="number" name="bonus" value="{{ user.bonus }}" min="0" step="any">
-                                        <button type="submit" class="update-button">Update</button>
-                                    </form>
-                                </td>
                                 <td>{{ user.total_spent }}</td>
-                                <td>{{ user.is_active }}</td>
-                                <td>{{ user.top_up_is_active }}</td>
-                                <td>{{ user.price_multiplier }}</td>
-                                <td>{{ user.bot_blocked }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
