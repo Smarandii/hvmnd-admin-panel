@@ -171,6 +171,37 @@ def edit_nodes():
     return render_template('edit_nodes.html', nodes=nodes)
 
 
+@app.route('/update_node/<int:node_id>', methods=['POST'])
+def update_node(node_id):
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+
+    old_id = request.form['old_id']
+    status = request.form['status']
+    software = request.form['software']
+    price = request.form['price']
+    cpu = request.form['cpu']
+    gpu = request.form['gpu']
+    other_specs = request.form['other_specs']
+    licenses = request.form['licenses']
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE nodes
+            SET old_id = %s, status = %s, software = %s, price = %s, cpu = %s, gpu = %s, other_specs = %s, licenses = %s
+            WHERE id = %s
+        """, (old_id, status, software, price, cpu, gpu, other_specs, licenses, node_id))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+    return redirect(url_for('edit_nodes'))
+
+
 @app.route('/deactivate_node/<int:node_id>', methods=['POST'])
 def deactivate_node(node_id):
     if not session.get('logged_in'):
