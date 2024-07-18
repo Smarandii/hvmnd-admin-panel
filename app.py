@@ -94,8 +94,8 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/update_balance/<user_telegram_id>', methods=['POST'])
-def update_balance(user_telegram_id):
+@app.route('/update_balance/<int:user_id>', methods=['POST'])
+def update_balance(user_id):
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     new_balance = request.form['balance']
@@ -104,8 +104,8 @@ def update_balance(user_telegram_id):
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute("""
-            UPDATE users SET balance = %s WHERE telegram_id = %s
-        """, (float(new_balance), int(user_telegram_id)))
+            UPDATE users SET balance = %s WHERE id = %s
+        """, (float(new_balance), int(user_id)))
         conn.commit()
         cur.close()
         conn.close()
@@ -115,8 +115,8 @@ def update_balance(user_telegram_id):
     return redirect(url_for('index'))
 
 
-@app.route('/payment_history/<int:telegram_id>/')
-def payment_history(telegram_id):
+@app.route('/payment_history/<int:user_id>/')
+def payment_history(user_id):
     if not session.get('logged_in'):
         return redirect(url_for('login'))
 
@@ -131,10 +131,10 @@ def payment_history(telegram_id):
         query = f"""
             SELECT id, user_id, amount, status, datetime FROM payments WHERE user_id = %s ORDER BY {sort_by} {sort_order}
         """
-        cur.execute(query, (telegram_id,))
+        cur.execute(query, (user_id,))
         payments = cur.fetchall()
 
-        cur.execute("SELECT id, telegram_id, first_name, last_name, username FROM users WHERE id = %s", (telegram_id,))
+        cur.execute("SELECT id, telegram_id, first_name, last_name, username FROM users WHERE id = %s", (user_id,))
         user = cur.fetchone()
 
         cur.close()

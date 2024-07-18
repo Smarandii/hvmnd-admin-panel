@@ -78,7 +78,7 @@
                         {% for user in users %}
                         <tr onclick="window.location.href='/payment_history/{{ user[0] }}'">
                             <td>{{ loop.index }}</td>
-                            <td>{{ user[0] }}</td>
+                            <td>{{ user[1] }}</td>
                             <td>{{ user[6] }}</td>
                             <td>
                                 <form action="/update_balance/{{ user[0] }}" method="post">
