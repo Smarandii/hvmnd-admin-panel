@@ -1,17 +1,18 @@
 import os
-
-import pymongo
-from dotenv import \
-    load_dotenv
+import psycopg2
+from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from flask_pymongo import PyMongo
 
 load_dotenv()
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
-mongo = PyMongo(app)
+DATABASE_URL = os.getenv("POSTGRES_URL")
+
+
+def get_db_connection():
+    conn = psycopg2.connect(DATABASE_URL)
+    return conn
 
 
 @app.route('/')
@@ -22,52 +23,52 @@ def index():
     search_query = request.args.get('search', '')
     sort_by = request.args.get('sort', "id")
     order = request.args.get('order', 'asc')
-    sort_order = pymongo.ASCENDING if order == 'asc' else pymongo.DESCENDING
+    sort_order = 'ASC' if order == 'asc' else 'DESC'
 
     try:
-        query = {}
-        if search_query:
-            search_regex = {'$regex': search_query, '$options': 'i'}
-            query['$or'] = [
-                {'username': search_regex},
-                {'firstname': search_regex},
-                {'lastname': search_regex},
-                {'language_code': search_regex},
-            ]
+        conn = get_db_connection()
+        cur = conn.cursor()
 
+        query = "SELECT id, telegram_id, total_spent, balance, first_name, last_name, username, language_code FROM users"
+        if search_query:
+            search_conditions = f"""
+                WHERE username ILIKE '%{search_query}%'
+                OR first_name ILIKE '%{search_query}%'
+                OR last_name ILIKE '%{search_query}%'
+                OR language_code ILIKE '%{search_query}%'
+            """
             try:
                 numeric_search = float(search_query)
-                numeric_conditions = [
-                    {"id": numeric_search},
-                    {'balance': numeric_search},
-                    {'total_spent': numeric_search},
-                    {'price_multiplier': numeric_search},
-                ]
-                query['$or'].extend(numeric_conditions)
+                numeric_conditions = f"""
+                    OR id = {numeric_search}
+                    OR balance = {numeric_search}
+                    OR total_spent = {numeric_search}
+                """
+                search_conditions += numeric_conditions
             except ValueError:
-                # If conversion fails, skip adding numeric fields to the query
                 pass
+            query += search_conditions
 
-        users = list(mongo.db.users.find(query).sort(sort_by, sort_order))
+        query += f" ORDER BY {sort_by} {sort_order}"
 
-        pipeline = [
-            {"$group": {
-                "_id": None,
-                "total_balance": {"$sum": "$balance"},
-                "total_spent": {"$sum": "$total_spent"}
-            }}
-        ]
-        totals = list(mongo.db.users.aggregate(pipeline))[0]
+        cur.execute(query)
+        users = cur.fetchall()
 
-        for key in totals.keys():
-            if key != "_id":
-                totals[key] = round(totals[key], 2)
+        cur.execute("""
+            SELECT SUM(balance) as total_balance, SUM(total_spent) as total_spent FROM users
+        """)
+        totals = cur.fetchone()
+        totals = {
+            'total_balance': round(totals[0], 2),
+            'total_spent': round(totals[1], 2)
+        }
 
+        cur.close()
+        conn.close()
     except Exception as e:
-
         print(f"An error occurred: {e}")
         users = []
-        totals = {"total_balance": 0.0, "total_bonus": 0.0, "total_spent": 0.0}
+        totals = {"total_balance": 0.0, "total_spent": 0.0}
 
     return render_template('users.html', users=users, totals=totals, search=search_query)
 
@@ -98,8 +99,18 @@ def update_balance(user_telegram_id):
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     new_balance = request.form['balance']
-    mongo.db.users.update_one({"id": int(user_telegram_id)},
-                              {"$set": {"balance": float(new_balance)}})
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE users SET balance = %s WHERE telegram_id = %s
+        """, (float(new_balance), int(user_telegram_id)))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
     return redirect(url_for('index'))
 
@@ -111,11 +122,23 @@ def payment_history(telegram_id):
 
     sort_by = request.args.get('sort', 'datetime')
     order = request.args.get('order', 'desc')
-    sort_order = pymongo.ASCENDING if order == 'asc' else pymongo.DESCENDING
+    sort_order = 'ASC' if order == 'asc' else 'DESC'
 
     try:
-        payments = mongo.db.payments.find({"user_id": telegram_id}).sort(sort_by, sort_order)
-        user = mongo.db.users.find_one({"id": telegram_id})
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT id, user_id, amount, status, datetime FROM payments WHERE user_id = %s ORDER BY %s %s
+        """, (telegram_id, sort_by, sort_order))
+        payments = cur.fetchall()
+
+        cur.execute("SELECT id, telegram_id, first_name, last_name, username FROM users WHERE id = %s", (telegram_id,))
+        user = cur.fetchone()
+
+        cur.close()
+        conn.close()
+
         return render_template('payment_history.html', payments=payments, user=user)
     except Exception as e:
         print(f"An error occurred: {e}")
