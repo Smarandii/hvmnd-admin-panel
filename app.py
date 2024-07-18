@@ -1,5 +1,6 @@
 import os
 import psycopg2
+from psycopg2 import pool
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import json
@@ -10,10 +11,30 @@ app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 DATABASE_URL = os.getenv("POSTGRES_URL")
 
+# Create a connection pool
+connection_pool = psycopg2.pool.SimpleConnectionPool(
+    1,  # Minimum number of connections
+    1,  # Maximum number of connections
+    DATABASE_URL
+)
+
 
 def get_db_connection():
-    conn = psycopg2.connect(DATABASE_URL)
-    return conn
+    try:
+        conn = connection_pool.getconn()
+        if conn:
+            print("Successfully received connection from connection pool")
+            return conn
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+def release_db_connection(conn):
+    try:
+        connection_pool.putconn(conn)
+        print("Successfully returned connection to connection pool")
+    except Exception as e:
+        print(f"Error: {e}")
 
 
 @app.route('/')
@@ -65,7 +86,7 @@ def index():
         }
 
         cur.close()
-        conn.close()
+        release_db_connection(conn)
     except Exception as e:
         print(f"An error occurred: {e}")
         users = []
@@ -109,7 +130,7 @@ def update_balance(user_id):
         """, (float(new_balance), int(user_id)))
         conn.commit()
         cur.close()
-        conn.close()
+        release_db_connection(conn)
     except Exception as e:
         print(f"An error occurred: {e}")
 
@@ -139,7 +160,7 @@ def payment_history(user_id):
         user = cur.fetchone()
 
         cur.close()
-        conn.close()
+        release_db_connection(conn)
 
         return render_template('payment_history.html', payments=payments, user=user)
     except Exception as e:
@@ -164,7 +185,7 @@ def edit_nodes():
         nodes = cur.fetchall()
 
         cur.close()
-        conn.close()
+        release_db_connection(conn)
     except Exception as e:
         print(f"An error occurred: {e}")
         nodes = []
@@ -196,7 +217,7 @@ def update_node(node_id):
         """, (old_id, status, software, price, cpu, gpu, other_specs, licenses, node_id))
         conn.commit()
         cur.close()
-        conn.close()
+        release_db_connection(conn)
     except Exception as e:
         print(f"An error occurred: {e}")
 
@@ -214,7 +235,7 @@ def deactivate_node(node_id):
         cur.execute("UPDATE nodes SET status = 'unavailable' WHERE id = %s", (node_id,))
         conn.commit()
         cur.close()
-        conn.close()
+        release_db_connection(conn)
     except Exception as e:
         print(f"An error occurred: {e}")
 
@@ -250,7 +271,7 @@ def edit_node(node_id):
             """, (old_id, status, software_json, price, cpu, gpu, other_specs, licenses_json, node_id))
             conn.commit()
             cur.close()
-            conn.close()
+            release_db_connection(conn)
         except Exception as e:
             print(f"An error occurred: {e}")
 
@@ -265,7 +286,7 @@ def edit_node(node_id):
         """, (node_id,))
         node = cur.fetchone()
         cur.close()
-        conn.close()
+        release_db_connection(conn)
     except Exception as e:
         print(f"An error occurred: {e}")
         node = None
