@@ -8,6 +8,14 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/search.js') }}"></script>
+<script>
+    function rowClick(event, userId) {
+        // Check if the clicked element is an input or button
+        if (event.target.tagName.toLowerCase() !== 'input' && event.target.tagName.toLowerCase() !== 'button') {
+            window.location.href = '/payment_history/' + userId;
+        }
+    }
+</script>
 {% endblock %}
 
 {% block content %}
@@ -76,7 +84,7 @@
                     </tr>
                     <tbody id="userTable">
                         {% for user in users %}
-                        <tr onclick="window.location.href='/payment_history/{{ user[0] }}'">
+                        <tr onclick="rowClick(event, {{ user[0] }})">
                             <td>{{ loop.index }}</td>
                             <td>{{ user[1] }}</td>
                             <td>{{ user[6] }}</td>
