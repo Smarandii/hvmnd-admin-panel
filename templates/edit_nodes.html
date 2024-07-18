@@ -51,7 +51,6 @@
                         <td>{{ node[13] }}</td>
                         <td>{{ node[14] }}</td>
                         <td>
-                            <a href="{{ url_for('edit_node', node_id=node[0]) }}" class="edit-button">Edit</a>
                             <form action="{{ url_for('deactivate_node', node_id=node[0]) }}" method="post" style="display:inline;">
                                 <button type="submit" class="deactivate-button">Deactivate</button>
                             </form>

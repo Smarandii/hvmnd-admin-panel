@@ -170,6 +170,7 @@ def edit_nodes():
 
     return render_template('edit_nodes.html', nodes=nodes)
 
+
 @app.route('/deactivate_node/<int:node_id>', methods=['POST'])
 def deactivate_node(node_id):
     if not session.get('logged_in'):
