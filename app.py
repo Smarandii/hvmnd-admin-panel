@@ -2,6 +2,7 @@ import os
 import psycopg2
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, flash, session
+import json
 
 load_dotenv()
 
@@ -236,13 +237,17 @@ def edit_node(node_id):
         licenses = request.form['licenses']
 
         try:
+            # Serialize the JSON fields
+            software_json = json.dumps(software)
+            licenses_json = json.dumps(licenses)
+
             conn = get_db_connection()
             cur = conn.cursor()
             cur.execute("""
                 UPDATE nodes
                 SET old_id = %s, status = %s, software = %s, price = %s, cpu = %s, gpu = %s, other_specs = %s, licenses = %s
                 WHERE id = %s
-            """, (old_id, status, software, price, cpu, gpu, other_specs, licenses, node_id))
+            """, (old_id, status, software_json, price, cpu, gpu, other_specs, licenses_json, node_id))
             conn.commit()
             cur.close()
             conn.close()
