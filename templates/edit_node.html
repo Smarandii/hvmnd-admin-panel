@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Node{% endblock %}
+
+{% block links %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/nodes-style.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="content-wrap">
+        <h2>Edit Node {{ node[0] }}</h2>
+        <form action="{{ url_for('edit_node', node_id=node[0]) }}" method="post">
+            <table class="table">
+                <tr>
+                    <th>ID</th>
+                    <td>{{ node[0] }}</td>
+                </tr>
+                <tr>
+                    <th>Old ID</th>
+                    <td><input type="number" name="old_id" value="{{ node[1] }}"></td>
+                </tr>
+                <tr>
+                    <th>AnyDesk Address</th>
+                    <td>{{ node[2] }}</td>
+                </tr>
+                <tr>
+                    <th>AnyDesk Password</th>
+                    <td>{{ node[3] }}</td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <td><input type="text" name="status" value="{{ node[4] }}"></td>
+                </tr>
+                <tr>
+                    <th>Software</th>
+                    <td><input type="text" name="software" value="{{ node[5] }}"></td>
+                </tr>
+                <tr>
+                    <th>Price</th>
+                    <td><input type="number" name="price" step="any" value="{{ node[6] }}"></td>
+                </tr>
+                <tr>
+                    <th>CPU</th>
+                    <td><input type="text" name="cpu" value="{{ node[7] }}"></td>
+                </tr>
+                <tr>
+                    <th>GPU</th>
+                    <td><input type="text" name="gpu" value="{{ node[8] }}"></td>
+                </tr>
+                <tr>
+                    <th>Other Specs</th>
+                    <td><input type="text" name="other_specs" value="{{ node[9] }}"></td>
+                </tr>
+                <tr>
+                    <th>Licenses</th>
+                    <td><input type="text" name="licenses" value="{{ node[10] }}"></td>
+                </tr>
+                <tr>
+                    <th>Machine ID</th>
+                    <td>{{ node[11] }}</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button type="submit" class="update-button">Save</button>
+                        <a href="{{ url_for('edit_nodes') }}" class="cancel-button">Cancel</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+{% endblock %}
