@@ -1,0 +1,15 @@
+.edit-button, .deactivate-button {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 2px;
+    background-color: #50b3a2;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.edit-button:hover, .deactivate-button:hover {
+    background-color: #429186;
+}

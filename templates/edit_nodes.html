@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Nodes{% endblock %}
+
+{% block links %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/nodes-style.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="content-wrap">
+        <h2>Edit Nodes</h2>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Old ID</th>
+                        <th>AnyDesk Address</th>
+                        <th>AnyDesk Password</th>
+                        <th>Status</th>
+                        <th>Software</th>
+                        <th>Price</th>
+                        <th>Renter</th>
+                        <th>Rent Start Time</th>
+                        <th>Last Balance Update</th>
+                        <th>CPU</th>
+                        <th>GPU</th>
+                        <th>Other Specs</th>
+                        <th>Licenses</th>
+                        <th>Machine ID</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for node in nodes %}
+                    <tr>
+                        <td>{{ node[0] }}</td>
+                        <td>{{ node[1] }}</td>
+                        <td>{{ node[2] }}</td>
+                        <td>{{ node[3] }}</td>
+                        <td>{{ node[4] }}</td>
+                        <td>{{ node[5] }}</td>
+                        <td>{{ node[6] }}</td>
+                        <td>{{ node[7] }}</td>
+                        <td>{{ node[8] }}</td>
+                        <td>{{ node[9] }}</td>
+                        <td>{{ node[10] }}</td>
+                        <td>{{ node[11] }}</td>
+                        <td>{{ node[12] }}</td>
+                        <td>{{ node[13] }}</td>
+                        <td>{{ node[14] }}</td>
+                        <td>
+                            <a href="{{ url_for('edit_node', node_id=node[0]) }}" class="edit-button">Edit</a>
+                            <form action="{{ url_for('deactivate_node', node_id=node[0]) }}" method="post" style="display:inline;">
+                                <button type="submit" class="deactivate-button">Deactivate</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

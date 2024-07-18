@@ -236,3 +236,19 @@ th a {
     margin-left: 5px; /* Space between text and arrow */
 }
 
+.edit-nodes-button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 20px;
+    background-color: #50b3a2;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.edit-nodes-button:hover {
+    background-color: #429186;
+}
+

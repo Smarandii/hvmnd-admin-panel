@@ -146,5 +146,47 @@ def payment_history(user_id):
         return "Error fetching payment history"
 
 
+@app.route('/edit_nodes')
+def edit_nodes():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT id, old_id, any_desk_address, any_desk_password, status, software, price, renter, 
+            rent_start_time, last_balance_update_timestamp, cpu, gpu, other_specs, licenses, machine_id 
+            FROM nodes
+        """)
+        nodes = cur.fetchall()
+
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        nodes = []
+
+    return render_template('edit_nodes.html', nodes=nodes)
+
+@app.route('/deactivate_node/<int:node_id>', methods=['POST'])
+def deactivate_node(node_id):
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("UPDATE nodes SET status = 'unavailable' WHERE id = %s", (node_id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+    return redirect(url_for('edit_nodes'))
+
+
 if __name__ == '__main__':
     app.run(debug=bool(os.getenv("IS_DEBUG", False)))

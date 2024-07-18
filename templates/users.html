@@ -10,7 +10,6 @@
 <script src="{{ url_for('static', filename='js/search.js') }}"></script>
 <script>
     function rowClick(event, userId) {
-        // Check if the clicked element is an input or button
         if (event.target.tagName.toLowerCase() !== 'input' && event.target.tagName.toLowerCase() !== 'button') {
             window.location.href = '/payment_history/' + userId;
         }
@@ -99,6 +98,10 @@
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+
+            <div class="button-container">
+                <a href="{{ url_for('edit_nodes') }}" class="edit-nodes-button">Edit Nodes</a>
             </div>
         </div>
     </div>
