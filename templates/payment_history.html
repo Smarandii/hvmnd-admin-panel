@@ -6,7 +6,6 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/payment-history.css') }}">
 {% endblock %}
 
-
 {% block content %}
     <div class="container">
         <nav aria-label="breadcrumb">
@@ -17,19 +16,19 @@
                     </a>
                 </li>
                 <li class="breadcrumb-item active" aria-current="page">
-                    <a href="{{ url_for('payment_history', telegram_id=user.id, sort='datetime', order='desc') }}">
-                        {{ user.username }}
+                    <a href="{{ url_for('payment_history', telegram_id=user[0], sort='datetime', order='desc') }}">
+                        {{ user[6] }}
                     </a>
                 </li>
             </ol>
         </nav>
-        <h2>Payment History for <a href="https://t.me/{{ user.username }}" target="_blank">@{{ user.username }}</a></h2>
+        <h2>Payment History for <a href="https://t.me/{{ user[6] }}" target="_blank">@{{ user[6] }}</a></h2>
         <div class="history-table">
             <table>
                 <thead>
                     <tr>
                         <th>
-                            <a href="{{ url_for('payment_history', telegram_id=user.id, sort='datetime', order='asc' if request.args.get('sort') == 'datetime' and request.args.get('order') != 'asc' else 'desc') }}">
+                            <a href="{{ url_for('payment_history', telegram_id=user[0], sort='datetime', order='asc' if request.args.get('sort') == 'datetime' and request.args.get('order') != 'asc' else 'desc') }}">
                                 Date/Time
                                 {% if request.args.get('sort') == 'datetime' %}
                                     <span class="sort-arrow">{{ '▲' if request.args.get('order') == 'asc' else '▼' }}</span>
@@ -37,7 +36,7 @@
                             </a>
                         </th>
                         <th>
-                            <a href="{{ url_for('payment_history', telegram_id=user.id, sort='amount', order='asc' if request.args.get('sort') == 'amount' and request.args.get('order') != 'asc' else 'desc') }}">
+                            <a href="{{ url_for('payment_history', telegram_id=user[0], sort='amount', order='asc' if request.args.get('sort') == 'amount' and request.args.get('order') != 'asc' else 'desc') }}">
                                 Amount
                                 {% if request.args.get('sort') == 'amount' %}
                                     <span class="sort-arrow">{{ '▲' if request.args.get('order') == 'asc' else '▼' }}</span>
@@ -45,7 +44,7 @@
                             </a>
                         </th>
                         <th>
-                            <a href="{{ url_for('payment_history', telegram_id=user.id, sort='status', order='asc' if request.args.get('sort') == 'status' and request.args.get('order') != 'asc' else 'desc') }}">
+                            <a href="{{ url_for('payment_history', telegram_id=user[0], sort='status', order='asc' if request.args.get('sort') == 'status' and request.args.get('order') != 'asc' else 'desc') }}">
                                 Status
                                 {% if request.args.get('sort') == 'status' %}
                                     <span class="sort-arrow">{{ '▲' if request.args.get('order') == 'asc' else '▼' }}</span>
@@ -57,12 +56,12 @@
                 <tbody>
                     {% for payment in payments %}
                     <tr>
-                        <td>{{ payment.datetime.strftime('%m/%d/%Y %H:%M') }}</td>
-                        <td>{{ "%.2f"|format(payment.amount) }} ₽</td>
-                        <td><span class="status {{ 'paid' if payment.status.lower() == 'paid' else 'unpaid' }}">{{ payment.status }}</span></td>
+                        <td>{{ payment[4].strftime('%m/%d/%Y %H:%M') }}</td>
+                        <td>{{ "%.2f"|format(payment[2]) }} ₽</td>
+                        <td><span class="status {{ 'paid' if payment[3].lower() == 'paid' else 'unpaid' }}">{{ payment[3] }}</span></td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="6">No payment history found.</td></tr>
+                    <tr><td colspan="3">No payment history found.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
