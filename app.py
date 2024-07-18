@@ -128,9 +128,10 @@ def payment_history(telegram_id):
         conn = get_db_connection()
         cur = conn.cursor()
 
-        cur.execute("""
-            SELECT id, user_id, amount, status, datetime FROM payments WHERE user_id = %s ORDER BY %s %s
-        """, (telegram_id, sort_by, sort_order))
+        query = f"""
+            SELECT id, user_id, amount, status, datetime FROM payments WHERE user_id = %s ORDER BY {sort_by} {sort_order}
+        """
+        cur.execute(query, (telegram_id,))
         payments = cur.fetchall()
 
         cur.execute("SELECT id, telegram_id, first_name, last_name, username FROM users WHERE id = %s", (telegram_id,))
