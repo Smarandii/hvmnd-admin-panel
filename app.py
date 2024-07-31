@@ -14,7 +14,7 @@ DATABASE_URL = os.getenv("POSTGRES_URL")
 # Create a connection pool
 connection_pool = psycopg2.pool.SimpleConnectionPool(
     1,  # Minimum number of connections
-    1,  # Maximum number of connections
+    3,  # Maximum number of connections
     DATABASE_URL
 )
 
