@@ -258,10 +258,6 @@ def edit_node(node_id):
         licenses = request.form['licenses']
 
         try:
-            # Serialize the JSON fields
-            software_json = json.dumps(software)
-            licenses_json = json.dumps(licenses)
-
             conn = get_db_connection()
             cur = conn.cursor()
             cur.execute("""
