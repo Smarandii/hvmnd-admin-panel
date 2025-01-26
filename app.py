@@ -1,11 +1,13 @@
 import os
-import json
 import psycopg2
 from psycopg2 import pool
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 
-load_dotenv()
+try:
+    load_dotenv()
+except Exception:
+    pass
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
@@ -264,7 +266,7 @@ def edit_node(node_id):
                 UPDATE nodes
                 SET old_id = %s, status = %s, software = %s, price = %s, cpu = %s, gpu = %s, other_specs = %s, licenses = %s
                 WHERE id = %s
-            """, (old_id, status, software_json, price, cpu, gpu, other_specs, licenses_json, node_id))
+            """, (old_id, status, software, price, cpu, gpu, other_specs, licenses, node_id))
             conn.commit()
             cur.close()
             release_db_connection(conn)
