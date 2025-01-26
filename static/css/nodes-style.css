@@ -54,16 +54,20 @@ header a:hover {
 }
 .table-responsive {
     margin-top: 20px;
+    overflow-x: auto;
 }
 table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+    overflow-x: auto;
+    display: block;
 }
 th, td {
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid #ddd;
+    white-space: nowrap;
 }
 th {
     background-color: #f2f2f2;
@@ -79,7 +83,6 @@ footer {
     background-color: #2E0F15;
     text-align: center;
 }
-
 .search-container {
     margin: 20px auto;
     width: 90%; /* Adjust width to match the table's width */
@@ -87,7 +90,6 @@ footer {
     display: flex;
     justify-content: center; /* Center the search bar if it's smaller than the container */
 }
-
 .search-input {
     flex-grow: 1; /* Allow input to take available space */
     padding: 10px;
@@ -95,8 +97,6 @@ footer {
     border: 1px solid #ddd;
     /* Remove margin-right if no button next to the search bar */
 }
-
-
 .search-button {
     border-radius: 4px;
     padding: 10px 20px;
@@ -105,7 +105,6 @@ footer {
     border: none;
     cursor: pointer;
 }
-
 .update-button, .deactivate-button {
     border-radius: 4px;
     padding: 5px 10px;
@@ -115,11 +114,9 @@ footer {
     border: none;
     cursor: pointer;
 }
-
 .search-button:hover, .update-button:hover, .deactivate-button:hover {
     background-color: #429186;
 }
-
 html, body {
     height: 100%;
     margin: 0;
@@ -131,7 +128,6 @@ html, body {
     content: '▲';
     font-size: 0.8em;
 }
-
 .sorted-desc::after {
     content: '▼';
     font-size: 0.8em;
@@ -142,28 +138,23 @@ html, body {
     justify-content: flex-start;
     margin-bottom: 10px;
 }
-
 .clear-sorting-button {
     margin-right: 10px;
     padding: 5px 10px;
     cursor: pointer;
 }
-
 .table-title {
     margin: 0;
 }
-
 th {
     background-color: #f2f2f2;
     text-transform: uppercase;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
-
 th:hover {
     background-color: #e0e0e0;
 }
-
 .login-container {
     max-width: 400px;
     margin: 50px auto;
@@ -173,18 +164,15 @@ th:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
-
 .login-container h2 {
     margin-bottom: 20px;
     font-size: 24px;
     color: #333;
 }
-
 .login-container form {
     display: flex;
     flex-direction: column;
 }
-
 .login-container input[type="text"],
 .login-container input[type="password"] {
     padding: 10px;
@@ -192,7 +180,6 @@ th:hover {
     border: 1px solid #ddd;
     border-radius: 4px;
 }
-
 .login-container button {
     padding: 10px;
     background-color: #50b3a2;
@@ -202,24 +189,19 @@ th:hover {
     cursor: pointer;
     transition: background-color 0.3s;
 }
-
 .login-container button:hover {
     background-color: #429186;
 }
-
 .flashes {
     color: red;
     margin-bottom: 15px;
 }
-
-
 th {
     cursor: pointer; /* Change cursor to indicate interactivity */
     background-color: #f2f2f2; /* Background color */
     text-transform: uppercase; /* Uppercase text */
     /* ... other th styles ... */
 }
-
 /* Style for the sorting links to not look like traditional hyperlinks */
 th a {
     color: inherit; /* Inherit the color from the th element */
@@ -228,108 +210,43 @@ th a {
     align-items: center; /* Align items vertically */
     justify-content: space-between; /* Space between text and arrow */
 }
-
 /* Sorting Arrows */
 .sort-arrow {
     font-size: 0.8em; /* Smaller font size for arrows */
     margin-left: 5px; /* Space between text and arrow */
 }
-
-
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-    color: #333;
-}
-.container {
-    width: 90%;
-    margin: auto;
-    overflow: hidden;
-}
-header {
-    background: #50b3a2;
-    color: white;
-    padding-top: 30px;
-    min-height: 70px;
-    border-bottom: #2E0F15 3px solid;
-}
-header a {
-    color: #ffffff;
-    text-decoration: none;
-    text-transform: uppercase;
-    font-size: 16px;
-}
-header ul {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-    overflow: hidden;
-}
-header li {
-    float: left;
-    display: inline;
-    padding: 0 20px 0 20px;
-}
-header #branding {
-    float: left;
-}
-header #branding h1 {
-    margin: 0;
-}
-header nav {
-    float: right;
-    margin-top: 10px;
-}
-header .highlight, header .current a {
-    color: #2E0F15;
-    font-weight: bold;
-}
-header a:hover {
-    color: #ffffff;
-    font-weight: bold;
-}
-.table-responsive {
-    margin-top: 20px;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-th, td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-th {
-    background-color: #f2f2f2;
-    text-transform: uppercase;
-}
-tr:hover {
-    background-color: #e9e9e9;
-}
-footer {
-    padding: 20px;
-    margin-top: 20px;
-    color: #ffffff;
-    background-color: #2E0F15;
-    text-align: center;
-}
-
-.update-button, .deactivate-button, .cancel-button {
-    border-radius: 4px;
-    padding: 5px 10px;
-    margin-top: 5px;
-    background-color: #50b3a2;
-    color: white;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    text-align: center;
-}
-
-.update-button:hover, .deactivate-button:hover, .cancel-button:hover {
-    background-color: #429186;
+/* Media Queries for Mobile Devices */
+@media screen and (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    table, thead, tbody, th, td, tr {
+        display: block;
+        width: 100%;
+    }
+    thead tr {
+        display: none;
+    }
+    tr {
+        margin-bottom: 10px;
+    }
+    td {
+        padding: 10px;
+        text-align: right;
+        position: relative;
+        border-bottom: 1px solid #ddd;
+    }
+    td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        width: 50%;
+        padding-left: 10px;
+        font-weight: bold;
+        text-align: left;
+    }
+    .deactivate-button {
+        margin-top: 5px;
+    }
 }

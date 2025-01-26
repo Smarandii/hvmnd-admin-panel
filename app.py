@@ -1,9 +1,9 @@
 import os
+import json
 import psycopg2
 from psycopg2 import pool
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-import json
 
 load_dotenv()
 
@@ -14,7 +14,7 @@ DATABASE_URL = os.getenv("POSTGRES_URL")
 # Create a connection pool
 connection_pool = psycopg2.pool.SimpleConnectionPool(
     1,  # Minimum number of connections
-    1,  # Maximum number of connections
+    3,  # Maximum number of connections
     DATABASE_URL
 )
 
@@ -258,10 +258,6 @@ def edit_node(node_id):
         licenses = request.form['licenses']
 
         try:
-            # Serialize the JSON fields
-            software_json = json.dumps(software)
-            licenses_json = json.dumps(licenses)
-
             conn = get_db_connection()
             cur = conn.cursor()
             cur.execute("""
