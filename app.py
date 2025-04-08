@@ -16,7 +16,7 @@ DATABASE_URL = os.getenv("POSTGRES_URL")
 # Create a connection pool
 connection_pool = psycopg2.pool.SimpleConnectionPool(
     1,  # Minimum number of connections
-    3,  # Maximum number of connections
+    10,  # Maximum number of connections
     DATABASE_URL
 )
 
@@ -88,12 +88,12 @@ def index():
         }
 
         cur.close()
-        release_db_connection(conn)
     except Exception as e:
         print(f"An error occurred: {e}")
         users = []
         totals = {"total_balance": 0.0, "total_spent": 0.0}
 
+    release_db_connection(conn)
     return render_template('users.html', users=users, totals=totals, search=search_query)
 
 
@@ -108,7 +108,7 @@ def login():
             return redirect(url_for('index'))
         else:
             flash('Invalid Credentials. Please try again.')
-
+    
     return render_template('login.html')
 
 
@@ -132,10 +132,10 @@ def update_balance(user_id):
         """, (float(new_balance), int(user_id)))
         conn.commit()
         cur.close()
-        release_db_connection(conn)
     except Exception as e:
         print(f"An error occurred: {e}")
 
+    release_db_connection(conn)
     return redirect(url_for('index'))
 
 
@@ -162,11 +162,13 @@ def payment_history(user_id):
         user = cur.fetchone()
 
         cur.close()
-        release_db_connection(conn)
 
+        release_db_connection(conn)
         return render_template('payment_history.html', payments=payments, user=user)
     except Exception as e:
         print(f"An error occurred: {e}")
+
+        release_db_connection(conn)
         return "Error fetching payment history"
 
 
@@ -180,18 +182,17 @@ def edit_nodes():
         cur = conn.cursor()
 
         cur.execute("""
-            SELECT id, old_id, any_desk_address, any_desk_password, status, software, price, renter, 
-            rent_start_time, last_balance_update_timestamp, cpu, gpu, other_specs, licenses, machine_id 
+            SELECT * 
             FROM nodes
         """)
         nodes = cur.fetchall()
 
         cur.close()
-        release_db_connection(conn)
     except Exception as e:
         print(f"An error occurred: {e}")
         nodes = []
-
+    
+    release_db_connection(conn)
     return render_template('edit_nodes.html', nodes=nodes)
 
 
@@ -219,10 +220,10 @@ def update_node(node_id):
         """, (old_id, status, software, price, cpu, gpu, other_specs, licenses, node_id))
         conn.commit()
         cur.close()
-        release_db_connection(conn)
     except Exception as e:
         print(f"An error occurred: {e}")
 
+    release_db_connection(conn)
     return redirect(url_for('edit_nodes'))
 
 
@@ -237,10 +238,10 @@ def deactivate_node(node_id):
         cur.execute("UPDATE nodes SET status = 'unavailable' WHERE id = %s", (node_id,))
         conn.commit()
         cur.close()
-        release_db_connection(conn)
     except Exception as e:
         print(f"An error occurred: {e}")
 
+    release_db_connection(conn)
     return redirect(url_for('edit_nodes'))
 
 
@@ -273,22 +274,23 @@ def edit_node(node_id):
         except Exception as e:
             print(f"An error occurred: {e}")
 
+        release_db_connection(conn)
         return redirect(url_for('edit_nodes'))
 
     try:
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute("""
-            SELECT id, old_id, any_desk_address, any_desk_password, status, software, price, cpu, gpu, other_specs, licenses, machine_id
+            SELECT *
             FROM nodes WHERE id = %s
         """, (node_id,))
         node = cur.fetchone()
         cur.close()
-        release_db_connection(conn)
     except Exception as e:
         print(f"An error occurred: {e}")
         node = None
 
+    release_db_connection(conn)
     return render_template('edit_node.html', node=node)
 
 
