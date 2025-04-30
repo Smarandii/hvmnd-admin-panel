@@ -16,7 +16,7 @@
                     </a>
                 </li>
                 <li class="breadcrumb-item active" aria-current="page">
-                    <a href="{{ url_for('payment_history', user_id=user[0], sort='datetime', order='desc') }}">
+                    <a href="{{ url_for('payments_bp.payment_history', user_id=user[0], sort='datetime', order='desc') }}">
                         {{ user[4] }}
                     </a>
                 </li>
@@ -28,7 +28,7 @@
                 <thead>
                     <tr>
                         <th>
-                            <a href="{{ url_for('payment_history', user_id=user[0], sort='datetime', order='asc' if request.args.get('sort') == 'datetime' and request.args.get('order') != 'asc' else 'desc') }}">
+                            <a href="{{ url_for('payments_bp.payment_history', user_id=user[0], sort='datetime', order='asc' if request.args.get('sort') == 'datetime' and request.args.get('order') != 'asc' else 'desc') }}">
                                 Date/Time
                                 {% if request.args.get('sort') == 'datetime' %}
                                     <span class="sort-arrow">{{ '▲' if request.args.get('order') == 'asc' else '▼' }}</span>
@@ -36,7 +36,7 @@
                             </a>
                         </th>
                         <th>
-                            <a href="{{ url_for('payment_history', user_id=user[0], sort='amount', order='asc' if request.args.get('sort') == 'amount' and request.args.get('order') != 'asc' else 'desc') }}">
+                            <a href="{{ url_for('payments_bp.payment_history', user_id=user[0], sort='amount', order='asc' if request.args.get('sort') == 'amount' and request.args.get('order') != 'asc' else 'desc') }}">
                                 Amount
                                 {% if request.args.get('sort') == 'amount' %}
                                     <span class="sort-arrow">{{ '▲' if request.args.get('order') == 'asc' else '▼' }}</span>
@@ -44,7 +44,7 @@
                             </a>
                         </th>
                         <th>
-                            <a href="{{ url_for('payment_history', user_id=user[0], sort='status', order='asc' if request.args.get('sort') == 'status' and request.args.get('order') != 'asc' else 'desc') }}">
+                            <a href="{{ url_for('payments_bp.payment_history', user_id=user[0], sort='status', order='asc' if request.args.get('sort') == 'status' and request.args.get('order') != 'asc' else 'desc') }}">
                                 Status
                                 {% if request.args.get('sort') == 'status' %}
                                     <span class="sort-arrow">{{ '▲' if request.args.get('order') == 'asc' else '▼' }}</span>

@@ -10,7 +10,7 @@
 <div class="container">
     <div class="content-wrap">
         <h2>Edit Node {{ node[2] }}</h2>
-        <form action="{{ url_for('edit_node', node_id=node[0]) }}" method="post">
+        <form action="{{ url_for('nodes_bp.edit_node', node_id=node[0]) }}" method="post">
             <table class="table">
                 <tr>
                     <th>ID</th>
@@ -63,7 +63,7 @@
                 <tr>
                     <td colspan="2">
                         <button type="submit" class="update-button">Save</button>
-                        <a href="{{ url_for('edit_nodes') }}" class="cancel-button">Cancel</a>
+                        <a href="{{ url_for('nodes_bp.edit_nodes') }}" class="cancel-button">Cancel</a>
                     </td>
                 </tr>
             </table>
