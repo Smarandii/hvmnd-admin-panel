@@ -14,10 +14,11 @@ RUN apt-get update \
 # Set the working directory in the container
 WORKDIR /app
 
-COPY . /app
-
 # Install Python dependencies
+COPY requirements.txt requirements.txt
 RUN pip install --upgrade pip && pip install -r requirements.txt
+
+COPY . /app
 
 EXPOSE 9875
 
