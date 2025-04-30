@@ -18,6 +18,12 @@
                 <ul>
                     {% if session.get('logged_in') %}
                         <li>
+                            <a href="{{ url_for('webapp_users') }}">WebApp Users</a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('telegram_users') }}">Telegram Users</a>
+                        </li>
+                        <li>
                             <a href="{{ url_for('edit_nodes') }}">Edit Nodes</a>
                         </li>
                         <li class="current">
