@@ -18,13 +18,12 @@
                 <ul>
                     {% if session.get('logged_in') %}
                         <li>
-                            <a href="{{ url_for('webapp_users') }}">WebApp Users</a>
+                            <!-- single user list the app has now -->
+                            <a href="{{ url_for('users.list_users') }}">Users</a>
                         </li>
                         <li>
-                            <a href="{{ url_for('telegram_users') }}">Telegram Users</a>
-                        </li>
-                        <li>
-                            <a href="{{ url_for('edit_nodes') }}">Edit Nodes</a>
+                            <!-- blueprint-qualified endpoint for the nodes page -->
+                            <a href="{{ url_for('nodes_bp.edit_nodes') }}">Edit Nodes</a>
                         </li>
                         <li class="current">
                             <a href="{{ url_for('logout') }}">Logout</a>
