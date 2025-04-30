@@ -25,4 +25,9 @@ class UserRepository:
             bal, spent = cur.fetchone()
             return {"total_balance": float(bal or 0), "total_spent": float(spent or 0)}
 
-    # …update, create, etc. as thin methods…
+    def update_balance(self, user_id: int, new_balance: float) -> None:
+        with get_conn() as (_, cur):
+            cur.execute(
+                "UPDATE users SET balance = %s WHERE id = %s",
+                (new_balance, user_id),
+            )

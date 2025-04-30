@@ -21,6 +21,4 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 EXPOSE 9875
 
-# Use Gunicorn as the WSGI server in production
-# "app:app" => "module:application" – i.e. the Flask instance in app.py
-CMD ["gunicorn", "--bind", "0.0.0.0:9875", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:9875", "run:app"]

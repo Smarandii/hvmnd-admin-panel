@@ -16,4 +16,20 @@ def create_app() -> Flask:
     app.register_blueprint(nodes.bp)
     app.register_blueprint(payments.bp)
 
+    app.add_url_rule(
+        "/", endpoint="index",
+        view_func=app.view_functions["users.list_users"],
+        methods=["GET"],
+    )
+    app.add_url_rule(
+        "/login", endpoint="login",
+        view_func=app.view_functions["auth.login"],
+        methods=["GET", "POST"],
+    )
+    app.add_url_rule(
+        "/logout", endpoint="logout",
+        view_func=app.view_functions["auth.logout"],
+        methods=["GET"],
+    )
+
     return app
