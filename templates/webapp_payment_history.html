@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Web-app Payment History{% endblock %}
+{% block links %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/payment-history.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('webapp_users.list_webapp_users') }}">Web-app Users</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ user[1] }}</li>
+    </ol>
+  </nav>
+
+  <h2>Payment History for {{ user[1] }}</h2>
+
+  <div class="history-table">
+    <table>
+      <thead>
+        <tr>
+          {% set s=sort, o=order %}
+          <th>
+            <a href="{{ url_for('webapp_users.payment_history_wa', user_id=user[0],
+                                 sort='created_at', order='asc' if s=='created_at' and o!='asc' else 'desc') }}">
+              Date/Time
+              {% if s=='created_at' %}
+                <span class="sort-arrow">{{ '▲' if o=='asc' else '▼' }}</span>
+              {% endif %}
+            </a>
+          </th>
+          <th>
+            <a href="{{ url_for('webapp_users.payment_history_wa', user_id=user[0],
+                                 sort='amount', order='asc' if s=='amount' and o!='asc' else 'desc') }}">
+              Amount
+              {% if s=='amount' %}
+                <span class="sort-arrow">{{ '▲' if o=='asc' else '▼' }}</span>
+              {% endif %}
+            </a>
+          </th>
+          <th>
+            <a href="{{ url_for('webapp_users.payment_history_wa', user_id=user[0],
+                                 sort='status', order='asc' if s=='status' and o!='asc' else 'desc') }}">
+              Status
+              {% if s=='status' %}
+                <span class="sort-arrow">{{ '▲' if o=='asc' else '▼' }}</span>
+              {% endif %}
+            </a>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+      {% for p in payments %}
+        <tr>
+          <td>{{ p[4].strftime('%m/%d/%Y %H:%M') }}</td>
+          <td>{{ "%.4f"|format(p[2]) }}</td>
+          <td><span class="status {{ 'paid' if p[3].lower() == 'paid' else 'unpaid' }}">{{ p[3] }}</span></td>
+        </tr>
+      {% else %}
+        <tr><td colspan="3">No records.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}

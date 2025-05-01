@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Web-app Users{% endblock %}
+{% block links %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/users-style.css') }}">
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/search.js') }}"></script>
+<script>
+function rowClick(event, userId) {
+  if (!['input', 'button'].includes(event.target.tagName.toLowerCase())) {
+    window.location.href = '/webapp_payment_history/' + userId;
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container"><div class="content-wrap">
+
+  <div class="search-container">
+    <form id="searchForm" method="GET" action="{{ url_for('webapp_users.list_webapp_users') }}">
+      <input class="search-input" id="searchInput" type="text" name="search"
+             placeholder="Search by e-mail…" value="{{ request.args.get('search', '') }}">
+      <button class="search-button" type="submit">Search</button>
+    </form>
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <tr class="header">
+        <th><a href="">#</a></th>
+        <th>
+          <a href="{{ url_for('webapp_users.list_webapp_users', sort='email',
+                               order='desc' if sort=='email' and order=='asc' else 'asc',
+                               search=request.args.get('search','')) }}">
+            Email
+            {% if sort == 'email' %}
+              <span class="sort-arrow">{{ '▲' if order=='asc' else '▼' }}</span>
+            {% endif %}
+          </a>
+        </th>
+        <th>
+          <a href="{{ url_for('webapp_users.list_webapp_users', sort='balance',
+                               order='desc' if sort=='balance' and order=='asc' else 'asc',
+                               search=request.args.get('search','')) }}">
+            Balance
+            {% if sort == 'balance' %}
+              <span class="sort-arrow">{{ '▲' if order=='asc' else '▼' }}</span>
+            {% endif %}
+          </a>
+        </th>
+        <th>
+          <a href="{{ url_for('webapp_users.list_webapp_users', sort='total_spent',
+                               order='desc' if sort=='total_spent' and order=='asc' else 'asc',
+                               search=request.args.get('search','')) }}">
+            Total&nbsp;Spent
+            {% if sort == 'total_spent' %}
+              <span class="sort-arrow">{{ '▲' if order=='asc' else '▼' }}</span>
+            {% endif %}
+          </a>
+        </th>
+        <th>Banned</th>
+        <th>Email&nbsp;Confirmed</th>
+      </tr>
+
+      <tbody>
+      {% for u in users %}
+        <tr onclick="rowClick(event, {{ u[0] }})">
+          <td>{{ loop.index }}</td>
+          <td>{{ u[1] }}</td>
+          <td>
+            <form action="{{ url_for('webapp_users.update_balance_wa', user_id=u[0]) }}"
+                  method="post">
+              <input type="number" name="balance" value="{{ u[3] }}" min="0" step="any">
+              <button class="update-button" type="submit">Update</button>
+            </form>
+          </td>
+          <td>{{ u[2] }}</td>
+          <td>{{ 'Yes' if u[4] else 'No' }}</td>
+          <td>{{ 'Yes' if u[5] else 'No' }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div></div>
+{% endblock %}

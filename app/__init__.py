@@ -1,7 +1,14 @@
 from flask import Flask
 from app.config import Config
 from app.db import init_pool
-from app.routes import auth, users, nodes, payments, stats
+from app.routes import (
+    auth,
+    users,
+    nodes,
+    payments,
+    stats,
+    webapp_users
+)
 
 
 def create_app() -> Flask:
@@ -16,6 +23,7 @@ def create_app() -> Flask:
     app.register_blueprint(nodes.bp)
     app.register_blueprint(payments.bp)
     app.register_blueprint(stats.bp)
+    app.register_blueprint(webapp_users.bp)
 
     app.add_url_rule(
         "/", endpoint="index",

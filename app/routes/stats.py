@@ -1,6 +1,3 @@
-# app/routes/stats.py
-from __future__ import annotations
-
 import json
 from flask import Blueprint, render_template, session, redirect, url_for
 from app.db import get_conn

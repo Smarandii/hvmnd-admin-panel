@@ -1,6 +1,3 @@
-# app/routes/payments.py
-from __future__ import annotations
-
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 
 from app.repositories.payments import PaymentRepository
