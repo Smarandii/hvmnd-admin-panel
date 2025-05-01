@@ -32,31 +32,53 @@
 
     <h2>Spending Breakdown</h2>
     <canvas id="spendingChart"></canvas>
+
+    <h2>Total Spending by Users (Top-10)</h2>
+    <canvas id="userSpendingChart"></canvas>
   </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+/* Doughnut: successful vs other spending ---------------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
-  // Simple doughnut chart: successful vs the rest of spending
-  const ctx = document.getElementById('spendingChart').getContext('2d');
+  const ctx1 = document.getElementById('spendingChart').getContext('2d');
   const successful = {{ total_paid }};
   const allSpent   = {{ total_spent }};
   const otherSpent = (allSpent - successful) < 0 ? 0 : (allSpent - successful);
 
-  new Chart(ctx, {
+  new Chart(ctx1, {
     type: 'doughnut',
     data: {
       labels: ['Successful payments', 'Other spending'],
-      datasets: [{
-        data: [successful, otherSpent],
-      }]
+      datasets: [{ data: [successful, otherSpent] }]
     },
     options: {
       plugins: {
         tooltip: { callbacks: {
-          label: ctx => ctx.formattedValue + ' ₽'
+          label: c => c.formattedValue + ' ₽'
+        }},
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+
+  /* Pie: total spending by users ----------------------------------------- */
+  const ctx2 = document.getElementById('userSpendingChart').getContext('2d');
+  const pieLabels  = {{ pie_labels|safe }};
+  const pieValues  = {{ pie_values|safe }};
+
+  new Chart(ctx2, {
+    type: 'pie',
+    data: {
+      labels: pieLabels,
+      datasets: [{ data: pieValues }]
+    },
+    options: {
+      plugins: {
+        tooltip: { callbacks: {
+          label: c => c.label + ': ' + c.formattedValue + ' ₽'
         }},
         legend: { position: 'bottom' }
       }
