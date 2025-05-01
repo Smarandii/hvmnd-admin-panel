@@ -21,7 +21,8 @@
     <table>
       <thead>
         <tr>
-          {% set s=sort, o=order %}
+          {% set s = sort %}
+          {% set o = order %}
           <th>
             <a href="{{ url_for('webapp_users.payment_history_wa', user_id=user[0],
                                  sort='created_at', order='asc' if s=='created_at' and o!='asc' else 'desc') }}">
