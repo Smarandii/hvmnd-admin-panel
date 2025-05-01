@@ -10,5 +10,6 @@ class Config:
     SECRET_KEY      = os.getenv("FLASK_SECRET_KEY", "dev-only-secret")
     DEBUG           = os.getenv("IS_DEBUG", "False").lower() == "true"
     DB_DSN          = os.getenv("POSTGRES_URL")
+    TRON_GRID_API_KEY = os.getenv("TRON_GRID_API_KEY")
     TEMPLATE_FOLDER = BASE_DIR / "templates"
     STATIC_FOLDER   = BASE_DIR / "static"

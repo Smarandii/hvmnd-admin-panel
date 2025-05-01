@@ -13,25 +13,39 @@
 
   <div class="card-grid">
     {# --- Telegram ----------------------------------------------------- #}
-    <div class="stat-card"><h3>Telegram Users</h3><p>{{ tg_user_count }}</p></div>
+    <div class="stat-card"><h3>Telegram Users</h3>
+      <p>{{ tg_user_count }}</p>
+    </div>
     <div class="stat-card"><h3>TG Balance</h3>
-      <p>{{ "{:,.2f}".format(tg_total_balance).replace(',', ' ') }} ₽</p></div>
+      <p>{{ "{:,.2f}".format(tg_total_balance).replace(',', ' ') }} ₽</p>
+    </div>
     <div class="stat-card"><h3>TG Spent&nbsp;(all)</h3>
-      <p>{{ "{:,.2f}".format(tg_total_spent).replace(',', ' ') }} ₽</p></div>
+      <p>{{ "{:,.2f}".format(tg_total_spent).replace(',', ' ') }} ₽</p>
+    </div>
     <div class="stat-card"><h3>TG Successful&nbsp;Payments</h3>
-      <p>{{ "{:,.2f}".format(tg_total_paid).replace(',', ' ') }} ₽</p></div>
+      <p>{{ "{:,.2f}".format(tg_total_paid).replace(',', ' ') }} ₽</p>
+    </div>
 
     {# --- Web-app ------------------------------------------------------- #}
-    <div class="stat-card"><h3>Web-app Users</h3><p>{{ wa_user_count }}</p></div>
+    <div class="stat-card"><h3>Web-app Users</h3><p>{{ wa_user_count }}</p>
+    </div>
     <div class="stat-card"><h3>Web-app&nbsp;Balance</h3>
-      <p>{{ "{:,.2f}".format(wa_total_balance).replace(',', ' ') }} $</p></div>
+      <p>{{ "{:,.2f}".format(wa_total_balance).replace(',', ' ') }} $</p>
+    </div>
     <div class="stat-card"><h3>Web-app&nbsp;Spent</h3>
-      <p>{{ "{:,.2f}".format(wa_total_spent).replace(',', ' ') }} $</p></div>
+      <p>{{ "{:,.2f}".format(wa_total_spent).replace(',', ' ') }} $</p>
+    </div>
 
     {# --- Crypto -------------------------------------------------------- #}
     <div class="stat-card"><h3>Total&nbsp;Crypto&nbsp;Received</h3>
-      <p>{{ "{:,.4f}".format(crypto_received).replace(',', ' ') }} $</p></div>
+      <p>{{ "{:,.4f}".format(crypto_received).replace(',', ' ') }} $</p>
+    </div>
+    <div class="stat-card"><h3>Wallet USDT Balance</h3>
+      <p>{{ "{:,.2f}".format(live_usdt).replace(",", " ") }} USDT</p>
+    </div>
   </div>
+
+
 
   {# ----------------------------- charts ------------------------------- #}
   <h2>Spending Breakdown (Telegram)</h2>

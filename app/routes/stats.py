@@ -106,6 +106,14 @@ def dashboard_route():
     net_labels = [lbl for lbl, _ in net_rows]
     net_values = [float(val) for _, val in net_rows]
 
+    with get_conn() as (_, cur):
+        cur.execute("SELECT DISTINCT address FROM crypto_deposit_addresses "
+                    "WHERE address IS NOT NULL")
+        addrs = [row[0] for row in cur.fetchall()]
+
+    from app.services.tron import total_usdt
+    live_usdt = total_usdt(addrs)
+
     # ------------------------------------------------------------------ #
     context = {
         # Telegram cards
@@ -131,5 +139,7 @@ def dashboard_route():
 
         "net_labels": json.dumps(net_labels, ensure_ascii=False),
         "net_values": json.dumps(net_values),
+
+        "live_usdt": live_usdt,
     }
     return render_template("dashboard.html", **context)
