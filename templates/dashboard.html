@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block page_title %}Statistics Dashboard{% endblock %}
+
+{% block links %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="content-wrap">
+    <h2>Overall Statistics</h2>
+
+    <div class="card-grid">
+      <div class="stat-card">
+        <h3>Total Users</h3>
+        <p>{{ user_count }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Balance</h3>
+        <p>{{ "{:,.2f}".format(total_balance).replace(',', ' ') }} ₽</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Spent (all)</h3>
+        <p>{{ "{:,.2f}".format(total_spent).replace(',', ' ') }} ₽</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Successful Payments</h3>
+        <p>{{ "{:,.2f}".format(total_paid).replace(',', ' ') }} ₽</p>
+      </div>
+    </div>
+
+    <h2>Spending Breakdown</h2>
+    <canvas id="spendingChart"></canvas>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Simple doughnut chart: successful vs the rest of spending
+  const ctx = document.getElementById('spendingChart').getContext('2d');
+  const successful = {{ total_paid }};
+  const allSpent   = {{ total_spent }};
+  const otherSpent = (allSpent - successful) < 0 ? 0 : (allSpent - successful);
+
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Successful payments', 'Other spending'],
+      datasets: [{
+        data: [successful, otherSpent],
+      }]
+    },
+    options: {
+      plugins: {
+        tooltip: { callbacks: {
+          label: ctx => ctx.formattedValue + ' ₽'
+        }},
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+});
+</script>
+{% endblock %}

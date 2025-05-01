@@ -9,97 +9,103 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/search.js') }}"></script>
 <script>
-    function rowClick(event, userId) {
-        if (event.target.tagName.toLowerCase() !== 'input' && event.target.tagName.toLowerCase() !== 'button') {
-            window.location.href = '/payment_history/' + userId;
-        }
+function rowClick(event, userId) {
+    if (event.target.tagName.toLowerCase() !== 'input' &&
+        event.target.tagName.toLowerCase() !== 'button') {
+        window.location.href = '/payment_history/' + userId;
     }
+}
 </script>
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <div class="content-wrap">
-            <div class="search-container">
-                <form id="searchForm" method="GET" action="{{ url_for('index') }}">
-                    <input type="text" name="search" id="searchInput" class="search-input" placeholder="Search users..." value="{{ request.args.get('search', '') }}">
-                    <button type="submit" class="search-button">Search</button>
-                </form>
-            </div>
+<div class="container">
+  <div class="content-wrap">
 
-            <div class="totals-display">
-                <p><strong>Total Balance:</strong> {{ "{:,.2f}".format(totals['total_balance']).replace(',', ' ') }} ₽</p>
-                <p><strong>Total Spent:</strong> {{ "{:,.2f}".format(totals['total_spent']).replace(',', ' ') }} ₽</p>
-                <p><strong>Total Successful Payments:</strong> {{ "{:,.2f}".format(total_paid).replace(',', ' ') }} ₽</p>
-            </div>
-
-            <div class="table-responsive">
-                <table>
-                    <tr class="header">
-                        <th>
-                            <a href="">
-                                Row Number
-                            </a>
-                        </th>
-                        <th>
-                            <a href="{{ url_for('index', sort='id', order='desc' if request.args.get('sort') == 'id' and request.args.get('order') == 'asc' else 'asc') }}">
-                                Telegram ID
-                                <span class="sort-arrow">
-                                    {% if request.args.get('sort') == 'id' %}
-                                        {{ '▲' if request.args.get('order') == 'asc' else '▼' }}
-                                    {% endif %}
-                                </span>
-                            </a>
-                        </th>
-                        <th>
-                            <a href="{{ url_for('index', sort='username', order='desc' if request.args.get('sort') == 'username' and request.args.get('order') == 'asc' else 'asc') }}">
-                                Telegram Username
-                                <span class="sort-arrow">
-                                    {% if request.args.get('sort') == 'username' %}
-                                        {{ '▲' if request.args.get('order') == 'asc' else '▼' }}
-                                    {% endif %}
-                                </span>
-                            </a>
-                        </th>
-                        <th>
-                            <a href="{{ url_for('index', sort='balance', order='desc' if request.args.get('sort') == 'balance' and request.args.get('order') == 'asc' else 'asc') }}">
-                                Balance
-                                <span class="sort-arrow">
-                                    {% if request.args.get('sort') == 'balance' %}
-                                        {{ '▲' if request.args.get('order') == 'asc' else '▼' }}
-                                    {% endif %}
-                                </span>
-                            </a>
-                        </th>
-                        <th>
-                            <a href="{{ url_for('index', sort='total_spent', order='desc' if request.args.get('sort') == 'total_spent' and request.args.get('order') == 'asc' else 'asc') }}">
-                                Total Spent
-                                <span class="sort-arrow">
-                                    {% if request.args.get('sort') == 'total_spent' %}
-                                        {{ '▲' if request.args.get('order') == 'asc' else '▼' }}
-                                    {% endif %}
-                                </span>
-                            </a>
-                        </th>
-                    </tr>
-                    <tbody id="userTable">
-                        {% for user in users %}
-                        <tr onclick="rowClick(event, {{ user[0] }})">
-                            <td>{{ loop.index }}</td>
-                            <td>{{ user[1] }}</td>
-                            <td>{{ user[6] }}</td>
-                            <td>
-                                <form action="/update_balance/{{ user[0] }}" method="post">
-                                    <input type="number" name="balance" value="{{ user[3] }}" min="0" step="any">
-                                    <button type="submit" class="update-button">Update</button>
-                                </form>
-                            </td>
-                            <td>{{ user[2] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <div class="search-container">
+      <form id="searchForm" method="GET" action="{{ url_for('index') }}">
+        <input type="text" name="search" id="searchInput"
+               class="search-input" placeholder="Search users..."
+               value="{{ request.args.get('search', '') }}">
+        <button type="submit" class="search-button">Search</button>
+      </form>
     </div>
+
+    <div class="table-responsive">
+      <table>
+        <tr class="header">
+          <th><a href="">Row #</a></th>
+          <th>
+            <a href="{{ url_for('index', sort='id',
+                    order='desc' if request.args.get('sort') == 'id'
+                                      and request.args.get('order') == 'asc'
+                                      else 'asc') }}">
+              Telegram ID
+              <span class="sort-arrow">
+                {% if request.args.get('sort') == 'id' %}
+                  {{ '▲' if request.args.get('order') == 'asc' else '▼' }}
+                {% endif %}
+              </span>
+            </a>
+          </th>
+          <th>
+            <a href="{{ url_for('index', sort='username',
+                    order='desc' if request.args.get('sort') == 'username'
+                                      and request.args.get('order') == 'asc'
+                                      else 'asc') }}">
+              Username
+              <span class="sort-arrow">
+                {% if request.args.get('sort') == 'username' %}
+                  {{ '▲' if request.args.get('order') == 'asc' else '▼' }}
+                {% endif %}
+              </span>
+            </a>
+          </th>
+          <th>
+            <a href="{{ url_for('index', sort='balance',
+                    order='desc' if request.args.get('sort') == 'balance'
+                                      and request.args.get('order') == 'asc'
+                                      else 'asc') }}">
+              Balance
+              <span class="sort-arrow">
+                {% if request.args.get('sort') == 'balance' %}
+                  {{ '▲' if request.args.get('order') == 'asc' else '▼' }}
+                {% endif %}
+              </span>
+            </a>
+          </th>
+          <th>
+            <a href="{{ url_for('index', sort='total_spent',
+                    order='desc' if request.args.get('sort') == 'total_spent'
+                                      and request.args.get('order') == 'asc'
+                                      else 'asc') }}">
+              Total Spent
+              <span class="sort-arrow">
+                {% if request.args.get('sort') == 'total_spent' %}
+                  {{ '▲' if request.args.get('order') == 'asc' else '▼' }}
+                {% endif %}
+              </span>
+            </a>
+          </th>
+        </tr>
+        <tbody id="userTable">
+          {% for user in users %}
+          <tr onclick="rowClick(event, {{ user[0] }})">
+            <td>{{ loop.index }}</td>
+            <td>{{ user[1] }}</td>
+            <td>{{ user[6] }}</td>
+            <td>
+              <form action="/update_balance/{{ user[0] }}" method="post">
+                <input type="number" name="balance" value="{{ user[3] }}" min="0" step="any">
+                <button type="submit" class="update-button">Update</button>
+              </form>
+            </td>
+            <td>{{ user[2] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 {% endblock %}
