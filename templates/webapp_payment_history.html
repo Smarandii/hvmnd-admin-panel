@@ -17,51 +17,94 @@
 
   <h2>Payment History for {{ user[1] }}</h2>
 
+  {% set s = sort %}{% set o = order %}
+
   <div class="history-table">
     <table>
       <thead>
         <tr>
-          {% set s = sort %}
-          {% set o = order %}
+          {# ------------------------- sortable headers -------------------- #}
           <th>
-            <a href="{{ url_for('webapp_users.payment_history_wa', user_id=user[0],
-                                 sort='created_at', order='asc' if s=='created_at' and o!='asc' else 'desc') }}">
+            <a href="{{ url_for('webapp_users.payment_history_wa',
+                                 user_id=user[0],
+                                 sort='created_at',
+                                 order='asc' if s=='created_at' and o!='asc' else 'desc') }}">
               Date/Time
               {% if s=='created_at' %}
                 <span class="sort-arrow">{{ '▲' if o=='asc' else '▼' }}</span>
               {% endif %}
             </a>
           </th>
+
           <th>
-            <a href="{{ url_for('webapp_users.payment_history_wa', user_id=user[0],
-                                 sort='amount', order='asc' if s=='amount' and o!='asc' else 'desc') }}">
-              Amount
+            <a href="{{ url_for('webapp_users.payment_history_wa',
+                                 user_id=user[0],
+                                 sort='amount',
+                                 order='asc' if s=='amount' and o!='asc' else 'desc') }}">
+              Amount&nbsp;({{ payments[0][8] if payments else 'token' }})
               {% if s=='amount' %}
                 <span class="sort-arrow">{{ '▲' if o=='asc' else '▼' }}</span>
               {% endif %}
             </a>
           </th>
+
           <th>
-            <a href="{{ url_for('webapp_users.payment_history_wa', user_id=user[0],
-                                 sort='status', order='asc' if s=='status' and o!='asc' else 'desc') }}">
+            <a href="{{ url_for('webapp_users.payment_history_wa',
+                                 user_id=user[0],
+                                 sort='status',
+                                 order='asc' if s=='status' and o!='asc' else 'desc') }}">
               Status
               {% if s=='status' %}
                 <span class="sort-arrow">{{ '▲' if o=='asc' else '▼' }}</span>
               {% endif %}
             </a>
           </th>
+
+          <th>
+            <a href="{{ url_for('webapp_users.payment_history_wa',
+                                 user_id=user[0],
+                                 sort='confirmations',
+                                 order='asc' if s=='confirmations' and o!='asc' else 'desc') }}">
+              Confs.
+              {% if s=='confirmations' %}
+                <span class="sort-arrow">{{ '▲' if o=='asc' else '▼' }}</span>
+              {% endif %}
+            </a>
+          </th>
+
+          <th>Network</th>
+          <th>Deposit&nbsp;Address</th>
+          <th>Tx&nbsp;Hash</th>
         </tr>
       </thead>
 
       <tbody>
       {% for p in payments %}
+        {#
+          tuple layout returned by repo:
+          0-id 1-user_id 2-amount 3-status 4-confirmations 5-created_at
+          6-tx_hash 7-network_name 8-token_symbol 9-address
+        #}
         <tr>
-          <td>{{ p[4].strftime('%m/%d/%Y %H:%M') }}</td>
+          <td>{{ p[5].strftime('%m/%d/%Y %H:%M') }}</td>
           <td>{{ "%.4f"|format(p[2]) }}</td>
-          <td><span class="status {{ 'paid' if p[3].lower() == 'paid' else 'unpaid' }}">{{ p[3] }}</span></td>
+
+          {# ----- colour coding by lower-case status ---------------------- #}
+          {% set cls = p[3].lower() %}
+          <td><span class="status {{ cls }}">{{ p[3] }}</span></td>
+
+          <td>{{ p[4] }}</td>
+          <td>{{ p[7] }} ({{ p[8] }})</td>
+          <td title="{{ p[9] }}">{{ p[9][:6] }}…{{ p[9][-6:] }}</td>
+          <td>
+            {% if p[6] %}
+              <a href="https://tronscan.org/#/transaction/{{ p[6] }}"
+                 target="_blank">view</a>
+            {% endif %}
+          </td>
         </tr>
       {% else %}
-        <tr><td colspan="3">No records.</td></tr>
+        <tr><td colspan="7">No records.</td></tr>
       {% endfor %}
       </tbody>
     </table>

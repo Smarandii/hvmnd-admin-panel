@@ -145,4 +145,7 @@
     color: #6c757d;
 }
 
-
+.status.confirmed  { background-color: #28a745; }   /* green   */
+.status.pending    { background-color: #ffc107; }   /* amber   */
+.status.failed,
+.status.error      { background-color: #dc3545; }   /* red     */
