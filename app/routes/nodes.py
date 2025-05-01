@@ -40,12 +40,12 @@ def edit_single_node(node_id: int):
     if request.method == "POST":
         _save_node_from_form(node_id, request.form)
         flash("Node updated.")
-        return redirect(url_for("edit_nodes"))
+        return redirect(url_for("nodes_bp.edit_nodes"))
 
     node = repo.get(node_id)
     if node is None:
         flash("Node not found.", "error")
-        return redirect(url_for("edit_nodes"))
+        return redirect(url_for("nodes_bp.edit_nodes"))
     return render_template("edit_node.html", node=node)
 
 
@@ -56,7 +56,7 @@ def update_node_route(node_id: int):
 
     _save_node_from_form(node_id, request.form)
     flash("Node updated.")
-    return redirect(url_for("edit_nodes"))
+    return redirect(url_for("nodes_bp.edit_nodes"))
 
 
 @bp.route(
@@ -68,7 +68,7 @@ def deactivate_node_route(node_id: int):
 
     repo.deactivate(node_id)
     flash("Node deactivated.")
-    return redirect(url_for("edit_nodes"))
+    return redirect(url_for("nodes_bp.edit_nodes"))
 
 
 # --------------------------------------------------------------------------- #
