@@ -28,8 +28,9 @@
             </div>
 
             <div class="totals-display">
-                <p><strong>Total Balance:</strong> {{ "{:,.2f}".format(totals['total_balance']).replace(',', ' ') }}</p>
-                <p><strong>Total Spent:</strong> {{ "{:,.2f}".format(totals['total_spent']).replace(',', ' ') }}</p>
+                <p><strong>Total Balance:</strong> {{ "{:,.2f}".format(totals['total_balance']).replace(',', ' ') }} ₽</p>
+                <p><strong>Total Spent:</strong> {{ "{:,.2f}".format(totals['total_spent']).replace(',', ' ') }} ₽</p>
+                <p><strong>Total Successful Payments:</strong> {{ "{:,.2f}".format(total_paid).replace(',', ' ') }} ₽</p>
             </div>
 
             <div class="table-responsive">

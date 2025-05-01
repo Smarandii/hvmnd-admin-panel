@@ -4,6 +4,10 @@ services:
   web:
     build: .
     container_name: hvmnd-admin-panel
+    volumes:
+      - ./app:/app/app
+      - ./static:/app/static
+      - ./templates:/app/templates
     ports:
       - "9875:9875"
     env_file:

@@ -1,9 +1,12 @@
 from flask import Blueprint, request, render_template, redirect, url_for, session, flash
+
+from app.repositories.payments import PaymentRepository
 from app.repositories.user import UserRepository
 
 bp = Blueprint("users", __name__)
 
 repo = UserRepository()
+payments_repo = PaymentRepository()
 
 
 @bp.get("/")
@@ -16,7 +19,15 @@ def list_users():
 
     users = repo.find_many(search=search, sort_by=sort, order=order)
     totals = repo.totals()
-    return render_template("users.html", users=users, totals=totals, search=search)
+    total_successful = payments_repo.total_successful()
+
+    return render_template(
+        template_name_or_list="users.html",
+        users=users,
+        totals=totals,
+        total_paid=total_successful,
+        search=search
+    )
 
 
 @bp.post("/update_balance/<int:user_id>", endpoint="update_balance")
@@ -27,7 +38,7 @@ def update_balance(user_id: int):
     try:
         repo.update_balance(user_id, float(request.form["balance"]))
         flash("Balance updated")
-    except Exception:                                 # pragma: no cover
+    except Exception:  # pragma: no cover
         flash("Could not update balance", "error")
 
     # keep original redirect target
