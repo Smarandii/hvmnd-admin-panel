@@ -38,9 +38,9 @@
 
     {# --- Crypto -------------------------------------------------------- #}
     <div class="stat-card"><h3>Total&nbsp;Crypto&nbsp;Received</h3>
-      <p>{{ "{:,.4f}".format(crypto_received).replace(',', ' ') }} $</p>
+      <p>{{ "{:,.2f}".format(crypto_received).replace(',', ' ') }} $</p>
     </div>
-    <div class="stat-card"><h3>Wallet USDT Balance</h3>
+    <div class="stat-card"><h3>Current TRC-20 USDT Balance</h3>
       <p>{{ "{:,.2f}".format(live_usdt).replace(",", " ") }} USDT</p>
     </div>
   </div>
@@ -53,6 +53,12 @@
 
   <h2>Spending Breakdown (Web-app)</h2>
   <div class="chart-box"><canvas id="waSpendingChart"></canvas></div>
+
+  <h2>Balance Breakdown (Telegram)</h2>
+  <div class="chart-box"><canvas id="tgBalanceChart"></canvas></div>
+
+  <h2>Balance Breakdown (Web-app)</h2>
+  <div class="chart-box"><canvas id="waBalanceChart"></canvas></div>
 
   <h2>Confirmed Crypto by Network</h2>
   <div class="chart-box"><canvas id="networkChart"></canvas></div>
@@ -78,6 +84,26 @@ document.addEventListener('DOMContentLoaded', () => {
     type: 'pie',
     data: { labels: {{ wa_pie_labels|safe }}, datasets: [{ data: {{ wa_pie_values|safe }} }] },
     options: { maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
+  });
+
+  /* ---------- TG user balance --------------------------------------- */
+  const tgBalCtx = document.getElementById('tgBalanceChart').getContext('2d');
+  new Chart(tgBalCtx, {
+    type: 'pie',
+    data: { labels: {{ tg_bal_labels|safe }},
+            datasets: [{ data: {{ tg_bal_values|safe }} }] },
+    options: { maintainAspectRatio:false,
+               plugins:{ legend:{ position:'bottom' } } }
+  });
+
+  /* ---------- WA user balance --------------------------------------- */
+  const waBalCtx = document.getElementById('waBalanceChart').getContext('2d');
+  new Chart(waBalCtx, {
+    type: 'pie',
+    data: { labels: {{ wa_bal_labels|safe }},
+            datasets: [{ data: {{ wa_bal_values|safe }} }] },
+    options: { maintainAspectRatio:false,
+               plugins:{ legend:{ position:'bottom' } } }
   });
 
   /* ---------- Crypto by network -------------------------------------- */

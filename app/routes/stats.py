@@ -1,6 +1,7 @@
 import json
 from flask import Blueprint, render_template, session, redirect, url_for
 from app.db import get_conn
+from app.services.tron import total_usdt
 from app.repositories.user import UserRepository
 from app.repositories.payments import PaymentRepository
 from app.repositories.webapp_user import WebAppUserRepository
@@ -111,10 +112,53 @@ def dashboard_route():
                     "WHERE address IS NOT NULL")
         addrs = [row[0] for row in cur.fetchall()]
 
-    from app.services.tron import total_usdt
     live_usdt = total_usdt(addrs)
 
     # ------------------------------------------------------------------ #
+    # 7. pie – BALANCE by Telegram users
+    with get_conn() as (_, cur):
+        cur.execute("""
+            SELECT COALESCE(NULLIF(username, ''), CONCAT('id_', id)) AS label,
+                   COALESCE(balance, 0)                             AS bal
+            FROM   users
+            WHERE  balance > 0
+            ORDER  BY bal DESC
+        """)
+        tg_bal_rows = cur.fetchall()
+
+    tg_bal_labels, tg_bal_values, other_tg_bal = [], [], 0.0
+    for idx, (lbl, val) in enumerate(tg_bal_rows):
+        if idx < 10:
+            tg_bal_labels.append(lbl)
+            tg_bal_values.append(float(val))
+        else:
+            other_tg_bal += float(val)
+    if other_tg_bal:
+        tg_bal_labels.append("Others")
+        tg_bal_values.append(other_tg_bal)
+
+    # 8. pie – BALANCE by Web-app users
+    with get_conn() as (_, cur):
+        cur.execute("""
+            SELECT email AS label,
+                   COALESCE(balance, 0) AS bal
+            FROM   webapp_users
+            WHERE  balance > 0
+            ORDER  BY bal DESC
+        """)
+        wa_bal_rows = cur.fetchall()
+
+    wa_bal_labels, wa_bal_values, other_wa_bal = [], [], 0.0
+    for idx, (lbl, val) in enumerate(wa_bal_rows):
+        if idx < 10:
+            wa_bal_labels.append(lbl)
+            wa_bal_values.append(float(val))
+        else:
+            other_wa_bal += float(val)
+    if other_wa_bal:
+        wa_bal_labels.append("Others")
+        wa_bal_values.append(other_wa_bal)
+
     context = {
         # Telegram cards
         "tg_user_count": tg_user_count,
@@ -141,5 +185,10 @@ def dashboard_route():
         "net_values": json.dumps(net_values),
 
         "live_usdt": live_usdt,
+
+        "tg_bal_labels": json.dumps(tg_bal_labels, ensure_ascii=False),
+        "tg_bal_values": json.dumps(tg_bal_values),
+        "wa_bal_labels": json.dumps(wa_bal_labels, ensure_ascii=False),
+        "wa_bal_values": json.dumps(wa_bal_values),
     }
     return render_template("dashboard.html", **context)
