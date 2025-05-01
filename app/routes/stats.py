@@ -3,10 +3,13 @@ from flask import Blueprint, render_template, session, redirect, url_for
 from app.db import get_conn
 from app.repositories.user import UserRepository
 from app.repositories.payments import PaymentRepository
+from app.repositories.webapp_user import WebAppUserRepository
 
 bp = Blueprint("stats_bp", __name__)
-users_repo = UserRepository()
-payments_repo = PaymentRepository()
+
+tg_users_repo = UserRepository()
+tg_pay_repo = PaymentRepository()
+wa_users_repo = WebAppUserRepository()
 
 
 def _require_login():
@@ -17,22 +20,32 @@ def _require_login():
 
 @bp.route("/dashboard", methods=["GET"], endpoint="dashboard")
 def dashboard_route():
-    """Show high-level statistics & charts."""
-    if (redirect_resp := _require_login()) is not None:
-        return redirect_resp
+    """Show high-level statistics & charts (Telegram + Web-app + Crypto)."""
+    if (redir := _require_login()) is not None:
+        return redir
 
     # ------------------------------------------------------------------ #
-    # Numeric figures
-    totals = users_repo.totals()
-    total_successful = payments_repo.total_successful()
+    # 1. numeric figures (Telegram)
+    tg_totals = tg_users_repo.totals()
+    tg_total_paid = tg_pay_repo.total_successful()
+    tg_user_count = tg_users_repo.find_many().__len__()  # small (<2k) – fine
 
+    # 2. numeric figures (Web-app)
+    wa_totals = wa_users_repo.totals()
+    wa_user_count = wa_users_repo.count()
+
+    # 3. total confirmed crypto received
     with get_conn() as (_, cur):
-        cur.execute("SELECT COUNT(*) FROM users")
-        (user_count,) = cur.fetchone()
+        cur.execute("""
+            SELECT COALESCE(SUM(amount), 0)
+            FROM   crypto_payment_transactions
+            WHERE  LOWER(status) = 'confirmed'
+        """)
+        (crypto_received,) = cur.fetchone()
+    crypto_received = float(crypto_received)
 
     # ------------------------------------------------------------------ #
-    # User-level spending for pie chart                                  #
-    # Grab all users ordered by spend, aggregate into Top-10 + Others
+    # 4. pie – spending by Telegram users (Top-10 already-paid)
     with get_conn() as (_, cur):
         cur.execute("""
             SELECT
@@ -41,32 +54,82 @@ def dashboard_route():
             FROM   users
             ORDER  BY spent DESC
         """)
-        rows = cur.fetchall()
+        tg_rows = cur.fetchall()
 
-    labels: list[str] = []
-    data:   list[float] = []
-    other_total = 0.0
-
-    for idx, (label, spent) in enumerate(rows):
-        spent_val = float(spent or 0)
+    tg_labels, tg_values, other = [], [], 0.0
+    for idx, (lbl, val) in enumerate(tg_rows):
         if idx < 10:
-            labels.append(label)
-            data.append(spent_val)
+            tg_labels.append(lbl)
+            tg_values.append(float(val or 0))
         else:
-            other_total += spent_val
+            other += float(val or 0)
+    if other:
+        tg_labels.append("Others")
+        tg_values.append(other)
 
-    if other_total:
-        labels.append("Others")
-        data.append(other_total)
+    # ------------------------------------------------------------------ #
+    # 5. pie – spending by Web-app users (Top-10)
+    with get_conn() as (_, cur):
+        cur.execute("""
+            SELECT
+                email                              AS label,
+                COALESCE(total_spent, 0)           AS spent
+            FROM   webapp_users
+            ORDER  BY spent DESC
+        """)
+        wa_rows = cur.fetchall()
 
+    wa_labels, wa_values, other_wa = [], [], 0.0
+    for idx, (lbl, val) in enumerate(wa_rows):
+        if idx < 10:
+            wa_labels.append(lbl)
+            wa_values.append(float(val or 0))
+        else:
+            other_wa += float(val or 0)
+    if other_wa:
+        wa_labels.append("Others")
+        wa_values.append(other_wa)
+
+    # ------------------------------------------------------------------ #
+    # 6. pie – confirmed crypto by network
+    with get_conn() as (_, cur):
+        cur.execute("""
+            SELECT n.name, SUM(t.amount) AS total
+            FROM   crypto_payment_transactions t
+            JOIN   crypto_networks n ON n.id = t.network_id
+            WHERE  LOWER(t.status) = 'confirmed'
+            GROUP  BY n.name
+            ORDER  BY total DESC
+        """)
+        net_rows = cur.fetchall()
+
+    net_labels = [lbl for lbl, _ in net_rows]
+    net_values = [float(val) for _, val in net_rows]
+
+    # ------------------------------------------------------------------ #
     context = {
-        # cards
-        "user_count":    user_count,
-        "total_balance": totals["total_balance"],
-        "total_spent":   totals["total_spent"],
-        "total_paid":    total_successful,
-        # pie-chart data (serialised to JSON once for the template)
-        "pie_labels": json.dumps(labels, ensure_ascii=False),
-        "pie_values": json.dumps(data),
+        # Telegram cards
+        "tg_user_count": tg_user_count,
+        "tg_total_balance": tg_totals["total_balance"],
+        "tg_total_spent": tg_totals["total_spent"],
+        "tg_total_paid": tg_total_paid,
+
+        # Web-app cards
+        "wa_user_count": wa_user_count,
+        "wa_total_balance": wa_totals["total_balance"],
+        "wa_total_spent": wa_totals["total_spent"],
+
+        # crypto card
+        "crypto_received": crypto_received,
+
+        # chart data (serialised once per chart)
+        "tg_pie_labels": json.dumps(tg_labels, ensure_ascii=False),
+        "tg_pie_values": json.dumps(tg_values),
+
+        "wa_pie_labels": json.dumps(wa_labels, ensure_ascii=False),
+        "wa_pie_values": json.dumps(wa_values),
+
+        "net_labels": json.dumps(net_labels, ensure_ascii=False),
+        "net_values": json.dumps(net_values),
     }
     return render_template("dashboard.html", **context)

@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block page_title %}Statistics Dashboard{% endblock %}
 
 {% block links %}
@@ -8,91 +7,73 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="content-wrap">
-    <h2>Overall Statistics</h2>
+<div class="container"><div class="content-wrap">
 
-    <div class="card-grid">
-      <div class="stat-card">
-        <h3>Total Users</h3>
-        <p>{{ user_count }}</p>
-      </div>
-      <div class="stat-card">
-        <h3>Total Balance</h3>
-        <p>{{ "{:,.2f}".format(total_balance).replace(',', ' ') }} ₽</p>
-      </div>
-      <div class="stat-card">
-        <h3>Total Spent (all)</h3>
-        <p>{{ "{:,.2f}".format(total_spent).replace(',', ' ') }} ₽</p>
-      </div>
-      <div class="stat-card">
-        <h3>Total Successful Payments</h3>
-        <p>{{ "{:,.2f}".format(total_paid).replace(',', ' ') }} ₽</p>
-      </div>
-    </div>
+  <h2>Overall Statistics</h2>
 
-    <h2>Spending Breakdown</h2>
-    <div class="chart-box">
-      <canvas id="spendingChart"></canvas>
-    </div>
+  <div class="card-grid">
+    {# --- Telegram ----------------------------------------------------- #}
+    <div class="stat-card"><h3>Telegram Users</h3><p>{{ tg_user_count }}</p></div>
+    <div class="stat-card"><h3>TG Balance</h3>
+      <p>{{ "{:,.2f}".format(tg_total_balance).replace(',', ' ') }} ₽</p></div>
+    <div class="stat-card"><h3>TG Spent&nbsp;(all)</h3>
+      <p>{{ "{:,.2f}".format(tg_total_spent).replace(',', ' ') }} ₽</p></div>
+    <div class="stat-card"><h3>TG Successful&nbsp;Payments</h3>
+      <p>{{ "{:,.2f}".format(tg_total_paid).replace(',', ' ') }} ₽</p></div>
 
-    <h2>Total Spending by Users (Top-10)</h2>
-    <div class="chart-box">
-      <canvas id="userSpendingChart"></canvas>
-    </div>
+    {# --- Web-app ------------------------------------------------------- #}
+    <div class="stat-card"><h3>Web-app Users</h3><p>{{ wa_user_count }}</p></div>
+    <div class="stat-card"><h3>Web-app&nbsp;Balance</h3>
+      <p>{{ "{:,.2f}".format(wa_total_balance).replace(',', ' ') }} $</p></div>
+    <div class="stat-card"><h3>Web-app&nbsp;Spent</h3>
+      <p>{{ "{:,.2f}".format(wa_total_spent).replace(',', ' ') }} $</p></div>
+
+    {# --- Crypto -------------------------------------------------------- #}
+    <div class="stat-card"><h3>Total&nbsp;Crypto&nbsp;Received</h3>
+      <p>{{ "{:,.4f}".format(crypto_received).replace(',', ' ') }} $</p></div>
   </div>
-</div>
+
+  {# ----------------------------- charts ------------------------------- #}
+  <h2>Spending Breakdown (Telegram)</h2>
+  <div class="chart-box"><canvas id="tgSpendingChart"></canvas></div>
+
+  <h2>Spending Breakdown (Web-app)</h2>
+  <div class="chart-box"><canvas id="waSpendingChart"></canvas></div>
+
+  <h2>Confirmed Crypto by Network</h2>
+  <div class="chart-box"><canvas id="networkChart"></canvas></div>
+
+</div></div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-/* Runs after DOM is ready ------------------------------------------------ */
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* ---------- Doughnut: successful vs other spending -------------------- */
-  const ctx1        = document.getElementById('spendingChart').getContext('2d');
-  const successful  = {{ total_paid }};
-  const allSpent    = {{ total_spent }};
-  const otherSpent  = Math.max(0, allSpent - successful);
-
-  new Chart(ctx1, {
-    type: 'doughnut',
-    data: {
-      labels: ['Successful payments', 'Other spending'],
-      datasets: [{ data: [successful, otherSpent] }]
-    },
-    options: {
-      maintainAspectRatio: false,
-      plugins: {
-        tooltip: { callbacks: {
-          label: c => c.formattedValue + ' ₽'
-        }},
-        legend: { position: 'bottom' }
-      }
-    }
-  });
-
-  /* ---------- Pie: spending by users (Top-10) --------------------------- */
-  const ctx2       = document.getElementById('userSpendingChart').getContext('2d');
-  const pieLabels  = {{ pie_labels|safe }};
-  const pieValues  = {{ pie_values|safe }};
-
-  new Chart(ctx2, {
+  /* ---------- TG user spend ------------------------------------------ */
+  const tgCtx   = document.getElementById('tgSpendingChart').getContext('2d');
+  new Chart(tgCtx, {
     type: 'pie',
-    data: {
-      labels: pieLabels,
-      datasets: [{ data: pieValues }]
-    },
-    options: {
-      maintainAspectRatio: false,
-      plugins: {
-        tooltip: { callbacks: {
-          label: c => c.label + ': ' + c.formattedValue + ' ₽'
-        }},
-        legend: { position: 'bottom' }
-      }
-    }
+    data: { labels: {{ tg_pie_labels|safe }}, datasets: [{ data: {{ tg_pie_values|safe }} }] },
+    options: { maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
   });
+
+  /* ---------- WA user spend ------------------------------------------ */
+  const waCtx   = document.getElementById('waSpendingChart').getContext('2d');
+  new Chart(waCtx, {
+    type: 'pie',
+    data: { labels: {{ wa_pie_labels|safe }}, datasets: [{ data: {{ wa_pie_values|safe }} }] },
+    options: { maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
+  });
+
+  /* ---------- Crypto by network -------------------------------------- */
+  const netCtx  = document.getElementById('networkChart').getContext('2d');
+  new Chart(netCtx, {
+    type: 'doughnut',
+    data: { labels: {{ net_labels|safe }}, datasets: [{ data: {{ net_values|safe }} }] },
+    options: { maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
+  });
+
 });
 </script>
 {% endblock %}
