@@ -3,17 +3,23 @@
 {% block title %}User Data{% endblock %}
 
 {% block links %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/users-style.css') }}">
+<link rel="stylesheet" type="text/css"
+      href="{{ url_for('static', filename='css/users-style.css') }}">
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/search.js') }}"></script>
 <script>
+/*
+ * Row-click opens **payment history** exactly as before,
+ * but we now ignore clicks on <input>, <button> *and* <a>
+ * so the new “interaction” button works independently.
+ */
 function rowClick(event, userId) {
-    if (event.target.tagName.toLowerCase() !== 'input' &&
-        event.target.tagName.toLowerCase() !== 'button') {
-        window.location.href = '/payment_history/' + userId;
-    }
+  const tag = event.target.tagName.toLowerCase();
+  if (!['input', 'button', 'a'].includes(tag)) {
+    window.location.href = '/payment_history/' + userId;
+  }
 }
 </script>
 {% endblock %}
@@ -22,24 +28,27 @@ function rowClick(event, userId) {
 <div class="container">
   <div class="content-wrap">
 
+    <!-- search bar -------------------------------------------------------- -->
     <div class="search-container">
       <form id="searchForm" method="GET" action="{{ url_for('index') }}">
-        <input type="text" name="search" id="searchInput"
-               class="search-input" placeholder="Search users..."
-               value="{{ request.args.get('search', '') }}">
-        <button type="submit" class="search-button">Search</button>
+        <input class="search-input" id="searchInput" type="text" name="search"
+               placeholder="Search users…" value="{{ request.args.get('search','') }}">
+        <button class="search-button" type="submit">Search</button>
       </form>
     </div>
 
+    <!-- data table -------------------------------------------------------- -->
     <div class="table-responsive">
       <table>
         <tr class="header">
           <th><a href="">Row #</a></th>
+
+          <!-- sortable Telegram-ID header -->
           <th>
             <a href="{{ url_for('index', sort='id',
-                    order='desc' if request.args.get('sort') == 'id'
-                                      and request.args.get('order') == 'asc'
-                                      else 'asc') }}">
+                     order='desc' if request.args.get('sort') == 'id'
+                                     and request.args.get('order') == 'asc'
+                                     else 'asc') }}">
               Telegram ID
               <span class="sort-arrow">
                 {% if request.args.get('sort') == 'id' %}
@@ -48,11 +57,13 @@ function rowClick(event, userId) {
               </span>
             </a>
           </th>
+
+          <!-- sortable username header -->
           <th>
             <a href="{{ url_for('index', sort='username',
-                    order='desc' if request.args.get('sort') == 'username'
-                                      and request.args.get('order') == 'asc'
-                                      else 'asc') }}">
+                     order='desc' if request.args.get('sort') == 'username'
+                                     and request.args.get('order') == 'asc'
+                                     else 'asc') }}">
               Username
               <span class="sort-arrow">
                 {% if request.args.get('sort') == 'username' %}
@@ -61,11 +72,13 @@ function rowClick(event, userId) {
               </span>
             </a>
           </th>
+
+          <!-- sortable balance header -->
           <th>
             <a href="{{ url_for('index', sort='balance',
-                    order='desc' if request.args.get('sort') == 'balance'
-                                      and request.args.get('order') == 'asc'
-                                      else 'asc') }}">
+                     order='desc' if request.args.get('sort') == 'balance'
+                                     and request.args.get('order') == 'asc'
+                                     else 'asc') }}">
               Balance
               <span class="sort-arrow">
                 {% if request.args.get('sort') == 'balance' %}
@@ -74,11 +87,13 @@ function rowClick(event, userId) {
               </span>
             </a>
           </th>
+
+          <!-- sortable total-spent header -->
           <th>
             <a href="{{ url_for('index', sort='total_spent',
-                    order='desc' if request.args.get('sort') == 'total_spent'
-                                      and request.args.get('order') == 'asc'
-                                      else 'asc') }}">
+                     order='desc' if request.args.get('sort') == 'total_spent'
+                                     and request.args.get('order') == 'asc'
+                                     else 'asc') }}">
               Total Spent
               <span class="sort-arrow">
                 {% if request.args.get('sort') == 'total_spent' %}
@@ -87,25 +102,46 @@ function rowClick(event, userId) {
               </span>
             </a>
           </th>
+
+          <!-- NEW COLUMN: interaction shortcut ----------------------------- -->
+          <th>Logs</th>
         </tr>
+
         <tbody id="userTable">
-          {% for user in users %}
+        {% for user in users %}
           <tr onclick="rowClick(event, {{ user[0] }})">
+
+            <!-- 0-based loop index -->
             <td>{{ loop.index }}</td>
+
+            <!-- telegram_id, username -->
             <td>{{ user[1] }}</td>
             <td>{{ user[6] }}</td>
+
+            <!-- balance: editable -->
             <td>
               <form action="/update_balance/{{ user[0] }}" method="post">
-                <input type="number" name="balance" value="{{ user[3] }}" min="0" step="any">
-                <button type="submit" class="update-button">Update</button>
+                <input type="number" name="balance" value="{{ user[3] }}"
+                       min="0" step="any">
+                <button class="update-button" type="submit">Update</button>
               </form>
             </td>
+
+            <!-- total_spent -->
             <td>{{ user[2] }}</td>
+
+            <!-- NEW CELL: interaction history button ---------------------- -->
+            <td>
+              <a class="interaction-button"
+                 href="{{ url_for('interactions_bp.interaction_history', user_id=user[0]) }}"
+                 title="View interaction history">&#128221;</a>
+            </td>
           </tr>
-          {% endfor %}
+        {% endfor %}
         </tbody>
       </table>
     </div>
+
   </div>
 </div>
 {% endblock %}

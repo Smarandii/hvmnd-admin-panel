@@ -7,7 +7,8 @@ from app.routes import (
     nodes,
     payments,
     stats,
-    webapp_users
+    webapp_users,
+    tg_interactions
 )
 
 
@@ -24,6 +25,7 @@ def create_app() -> Flask:
     app.register_blueprint(payments.bp)
     app.register_blueprint(stats.bp)
     app.register_blueprint(webapp_users.bp)
+    app.register_blueprint(tg_interactions.bp)
 
     app.add_url_rule(
         "/", endpoint="index",

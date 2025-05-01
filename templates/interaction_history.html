@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Interaction History{% endblock %}
+
+{% block links %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/payment-history.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Telegram Users</a></li>
+      <li class="breadcrumb-item active" aria-current="page">
+        {{ user[4] or 'id_' ~ user[0] }}
+      </li>
+    </ol>
+  </nav>
+
+  <h2>Interaction History for {{ user[4] or ('id_' ~ user[0]) }}</h2>
+
+  {% set s = sort %}{% set o = order %}
+  <div class="history-table">
+    <table>
+      <thead>
+        <tr>
+          {# sortable headers ------------------------------------------------ #}
+          <th>
+            <a href="{{ url_for('interactions_bp.interaction_history',
+                                 user_id=user[0],
+                                 sort='timestamp',
+                                 order='asc' if s=='timestamp' and o!='asc' else 'desc') }}">
+              Date / Time
+              {% if s=='timestamp' %}
+                <span class="sort-arrow">{{ '▲' if o=='asc' else '▼' }}</span>
+              {% endif %}
+            </a>
+          </th>
+
+          <th>
+            <a href="{{ url_for('interactions_bp.interaction_history',
+                                 user_id=user[0],
+                                 sort='event_type',
+                                 order='asc' if s=='event_type' and o!='asc' else 'desc') }}">
+              Event&nbsp;Type
+              {% if s=='event_type' %}
+                <span class="sort-arrow">{{ '▲' if o=='asc' else '▼' }}</span>
+              {% endif %}
+            </a>
+          </th>
+
+          <th>Event&nbsp;Data</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      {% for i in interactions %}
+        {# tuple layout: 0-id 1-tg_id 2-type 3-data 4-ts --------------------- #}
+        <tr>
+          <td>{{ i[4].strftime('%m/%d/%Y %H:%M') }}</td>
+          <td>{{ i[2] }}</td>
+          <td style="white-space: pre-wrap;">{{ i[3] or '-' }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="3">No interaction records.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}
