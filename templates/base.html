@@ -20,7 +20,7 @@
       {% if session.get('logged_in') %}
       <nav>
         <ul>
-          <li><a href="{{ url_for('users.list_users') }}">Users</a></li>
+          <li><a href="{{ url_for('users.list_users') }}">Telegram Users</a></li>
           <li><a href="{{ url_for('nodes_bp.edit_nodes') }}">Edit Nodes</a></li>
           <li><a href="{{ url_for('stats_bp.dashboard') }}">Dashboard</a></li> <!-- NEW -->
           <li class="current"><a href="{{ url_for('logout') }}">Logout</a></li>

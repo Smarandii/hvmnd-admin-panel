@@ -1,4 +1,21 @@
-/* Basic cards & layout – keeps the existing aesthetic */
+/* ----------------------------------------------------------------------- */
+/* Dashboard – share the same colours / typography the rest of the site   */
+/* ----------------------------------------------------------------------- */
+
+body {
+  background-color: #f4f4f4;   /* same as users / nodes pages            */
+  color: #333;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+/* Cards with the familiar teal accent ---------------------------------- */
 
 .card-grid {
   display: grid;
@@ -11,7 +28,7 @@
   background: #ffffff;
   border-radius: 8px;
   padding: 1.2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
   text-align: center;
 }
 
@@ -22,7 +39,20 @@
 }
 
 .stat-card p {
-  margin: 0.5rem 0 0;
+  margin: .5rem 0 0;
   font-size: 1.4rem;
   font-weight: bold;
+}
+
+/* Charts --------------------------------------------------------------- */
+/* Use a wrapper that limits width; Chart.js will scale the canvas       */
+
+.chart-box {
+  max-width: 420px;               /* ~400 px visible graph               */
+  margin: 1.5rem auto;            /* centred below the heading           */
+}
+
+.chart-box canvas {
+  width: 100% !important;         /* responsive inside the wrapper       */
+  height: auto !important;
 }

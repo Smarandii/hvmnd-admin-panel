@@ -3,7 +3,8 @@
 {% block page_title %}Statistics Dashboard{% endblock %}
 
 {% block links %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/dashboard.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -31,22 +32,28 @@
     </div>
 
     <h2>Spending Breakdown</h2>
-    <canvas id="spendingChart"></canvas>
+    <div class="chart-box">
+      <canvas id="spendingChart"></canvas>
+    </div>
 
     <h2>Total Spending by Users (Top-10)</h2>
-    <canvas id="userSpendingChart"></canvas>
+    <div class="chart-box">
+      <canvas id="userSpendingChart"></canvas>
+    </div>
   </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-/* Doughnut: successful vs other spending ---------------------------------- */
+/* Runs after DOM is ready ------------------------------------------------ */
 document.addEventListener('DOMContentLoaded', () => {
-  const ctx1 = document.getElementById('spendingChart').getContext('2d');
-  const successful = {{ total_paid }};
-  const allSpent   = {{ total_spent }};
-  const otherSpent = (allSpent - successful) < 0 ? 0 : (allSpent - successful);
+
+  /* ---------- Doughnut: successful vs other spending -------------------- */
+  const ctx1        = document.getElementById('spendingChart').getContext('2d');
+  const successful  = {{ total_paid }};
+  const allSpent    = {{ total_spent }};
+  const otherSpent  = Math.max(0, allSpent - successful);
 
   new Chart(ctx1, {
     type: 'doughnut',
@@ -55,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
       datasets: [{ data: [successful, otherSpent] }]
     },
     options: {
+      maintainAspectRatio: false,
       plugins: {
         tooltip: { callbacks: {
           label: c => c.formattedValue + ' ₽'
@@ -64,8 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  /* Pie: total spending by users ----------------------------------------- */
-  const ctx2 = document.getElementById('userSpendingChart').getContext('2d');
+  /* ---------- Pie: spending by users (Top-10) --------------------------- */
+  const ctx2       = document.getElementById('userSpendingChart').getContext('2d');
   const pieLabels  = {{ pie_labels|safe }};
   const pieValues  = {{ pie_values|safe }};
 
@@ -76,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
       datasets: [{ data: pieValues }]
     },
     options: {
+      maintainAspectRatio: false,
       plugins: {
         tooltip: { callbacks: {
           label: c => c.label + ': ' + c.formattedValue + ' ₽'
