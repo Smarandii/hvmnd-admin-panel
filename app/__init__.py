@@ -8,17 +8,21 @@ from app.routes import (
     payments,
     stats,
     webapp_users,
-    tg_interactions
+    tg_interactions,
+    all_interactions,
 )
 
 
 def create_app() -> Flask:
-    app = Flask(__name__,
-                template_folder=Config.TEMPLATE_FOLDER,
-                static_folder=Config.STATIC_FOLDER)
+    app = Flask(
+        __name__,
+        template_folder=Config.TEMPLATE_FOLDER,
+        static_folder=Config.STATIC_FOLDER,
+    )
     app.config.from_object(Config)
     init_pool(Config.DB_DSN)
 
+    # blueprints -------------------------------------------------------------
     app.register_blueprint(auth.bp)
     app.register_blueprint(users.bp)
     app.register_blueprint(nodes.bp)
@@ -26,7 +30,9 @@ def create_app() -> Flask:
     app.register_blueprint(stats.bp)
     app.register_blueprint(webapp_users.bp)
     app.register_blueprint(tg_interactions.bp)
+    app.register_blueprint(all_interactions.bp)
 
+    # convenience routes -----------------------------------------------------
     app.add_url_rule(
         "/", endpoint="index",
         view_func=app.view_functions["users.list_users"],

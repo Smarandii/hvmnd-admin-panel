@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}All Interactions{% endblock %}
+
+{% block links %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/payment-history.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <h2>Live Telegram Interaction Log</h2>
+
+  {% set s = sort %}{% set o = order %}
+
+  <div class="history-table">
+    <table>
+      <thead>
+        <tr>
+          <th>
+            <a href="{{ url_for('all_interactions_bp.all_interactions',
+                                 sort='timestamp',
+                                 order='asc' if s=='timestamp' and o!='asc' else 'desc',
+                                 limit=limit) }}">
+              Date / Time
+              {% if s=='timestamp' %}
+                <span class="sort-arrow">{{ '▲' if o=='asc' else '▼' }}</span>
+              {% endif %}
+            </a>
+          </th>
+
+          <th>
+            <a href="{{ url_for('all_interactions_bp.all_interactions',
+                                 sort='username',
+                                 order='asc' if s=='username' and o!='asc' else 'desc',
+                                 limit=limit) }}">
+              User
+              {% if s=='username' %}
+                <span class="sort-arrow">{{ '▲' if o=='asc' else '▼' }}</span>
+              {% endif %}
+            </a>
+          </th>
+
+          <th>Telegram&nbsp;ID</th>
+
+          <th>
+            <a href="{{ url_for('all_interactions_bp.all_interactions',
+                                 sort='event_type',
+                                 order='asc' if s=='event_type' and o!='asc' else 'desc',
+                                 limit=limit) }}">
+              Event&nbsp;Type
+              {% if s=='event_type' %}
+                <span class="sort-arrow">{{ '▲' if o=='asc' else '▼' }}</span>
+              {% endif %}
+            </a>
+          </th>
+
+          <th>Event&nbsp;Data</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      {% for i in interactions %}
+        <tr>
+          <td>{{ i[6].strftime('%m/%d/%Y %H:%M') }}</td>
+          <td>{{ i[2] }}</td>
+          <td>{{ i[3] }}</td>
+          <td>{{ i[4] }}</td>
+          <td style="white-space: pre-wrap;">{{ i[5] or '-' }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5">No interaction records.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+/* Auto-refresh every 10 s for an almost live feed */
+setTimeout(() => location.reload(), 10_000);
+</script>
+{% endblock %}

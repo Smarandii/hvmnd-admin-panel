@@ -1,5 +1,4 @@
-# app/repositories/nodes.py
-from typing import Any, Sequence
+from typing import Any
 
 from app.db import get_conn
 

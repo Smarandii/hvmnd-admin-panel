@@ -1,4 +1,3 @@
-# app/repositories/user.py
 from typing import Any
 
 from app.db import get_conn

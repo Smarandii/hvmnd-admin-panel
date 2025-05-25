@@ -1,4 +1,3 @@
-# app/repositories/payments.py
 from typing import Any
 
 from app.db import get_conn

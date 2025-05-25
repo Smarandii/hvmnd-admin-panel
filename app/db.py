@@ -1,7 +1,6 @@
 import psycopg2
 from psycopg2 import pool
 from contextlib import contextmanager
-from flask import current_app
 
 _pool: pool.SimpleConnectionPool | None = None
 

@@ -4,7 +4,6 @@
     <title>{% block page_title %}{% endblock %}</title>
 
     {% block links %}{% endblock %}
-    <!-- Chart.js CDN is included globally so any template can use it -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     {% block scripts %}{% endblock %}
@@ -24,6 +23,7 @@
           <li><a href="{{ url_for('webapp_users.list_webapp_users') }}">Web-app Users</a></li>
           <li><a href="{{ url_for('nodes_bp.edit_nodes') }}">Edit Nodes</a></li>
           <li><a href="{{ url_for('stats_bp.dashboard') }}">Dashboard</a></li>
+          <li><a href="{{ url_for('all_interactions_bp.all_interactions') }}">Logs</a></li>
           <li class="current"><a href="{{ url_for('logout') }}">Logout</a></li>
         </ul>
       </nav>

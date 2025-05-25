@@ -1,4 +1,3 @@
-# app/routes/interactions.py
 from flask import (
     Blueprint,
     render_template,
